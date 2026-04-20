@@ -12,14 +12,14 @@ run_worker_first = true
 [[d1_databases]]
 binding = "DB"
 database_name = "dopamine-db"
-database_id = "REPLACE_WITH_YOUR_D1_ID"
+database_id = "98ad4284-f530-4917-8161-0a2a0561c88b"
 migrations_dir = "migrations"
 
 # ─── KV Namespaces ──────────────────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "KV"
-id = "REPLACE_WITH_YOUR_KV_ID"
-preview_id = "REPLACE_WITH_YOUR_KV_PREVIEW_ID"
+id = "187a32040f584bb58e092badbde743c4"
+preview_id = "91a98c555cd04e2cb19c4c13b83ae1b9"
 
 # ─── R2 Bucket ──────────────────────────────────────────────────────────────
 [[r2_buckets]]
@@ -35,7 +35,7 @@ MAX_UPLOAD_SIZE_MB = "5"
 EXERCISEDB_BASE_URL = "https://exercisedb.p.rapidapi.com"
 WGER_BASE_URL = "https://wger.de/api/v2"
 APP_NAME = "Dopamine Fitness"
-APP_ALLOWED_ORIGINS = "http://localhost:5173"
+APP_ALLOWED_ORIGINS = "https://dopamine.limonmilion2007.workers.dev"
 
 # ─── Secrets (set via: wrangler secret put SECRET_NAME) ─────────────────────
 # JWT_SECRET

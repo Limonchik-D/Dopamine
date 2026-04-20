@@ -38,14 +38,3 @@ CREATE INDEX IF NOT EXISTS idx_progress_user_exercise_date
 
 CREATE INDEX IF NOT EXISTS idx_progress_user_custom_exercise_date
   ON progress_snapshots(user_id, custom_exercise_id, date ASC);
-
--- ─── Consistency trigger for users.updated_at ───────────────────────────────
-CREATE TRIGGER IF NOT EXISTS trg_users_set_updated_at
-AFTER UPDATE OF email, username, password_hash ON users
-FOR EACH ROW
-WHEN NEW.updated_at = OLD.updated_at
-BEGIN
-  UPDATE users
-  SET updated_at = datetime('now')
-  WHERE id = NEW.id;
-END;

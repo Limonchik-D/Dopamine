@@ -1,9 +1,6 @@
 -- Migration: 0001_initial_schema.sql
 -- Dopamine Fitness — initial database schema
 
-PRAGMA journal_mode = WAL;
-PRAGMA foreign_keys = ON;
-
 -- ─── Users ────────────────────────────────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS users (
