@@ -6,7 +6,7 @@ compatibility_flags = ["nodejs_compat"]
 [assets]
 directory = "./web/dist"
 not_found_handling = "single-page-application"
-run_worker_first = ["/api/*", "/health"]
+run_worker_first = true
 
 # ─── D1 Database ────────────────────────────────────────────────────────────
 [[d1_databases]]
@@ -55,7 +55,7 @@ vars = { ENVIRONMENT = "staging", APP_ALLOWED_ORIGINS = "https://staging.example
 [env.staging.assets]
 directory = "./web/dist"
 not_found_handling = "single-page-application"
-run_worker_first = ["/api/*", "/health"]
+run_worker_first = true
 
 [[env.staging.d1_databases]]
 binding = "DB"
