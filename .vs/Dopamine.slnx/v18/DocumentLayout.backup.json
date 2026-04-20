@@ -3,12 +3,28 @@
   "WorkspaceRootPath": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|c:\\\u043A\u043E\u0434\\vs\\dopamine\\dopamine-fitness\\migrations\\0003_db_hardening_indexes_triggers.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}",
-      "RelativeMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|solutionrelative:dopamine-fitness\\migrations\\0003_db_hardening_indexes_triggers.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
+      "AbsoluteMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|c:\\\u043A\u043E\u0434\\vs\\dopamine\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|c:\\\u043A\u043E\u0434\\vs\\dopamine\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|c:\\\u043A\u043E\u0434\\vs\\dopamine\\dopamine-fitness\\web\\index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|solutionrelative:dopamine-fitness\\web\\index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|c:\\\u043A\u043E\u0434\\vs\\dopamine\\dopamine-fitness\\package.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|solutionrelative:dopamine-fitness\\package.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|c:\\\u043A\u043E\u0434\\vs\\dopamine\\dopamine-fitness\\docs\\operations.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "RelativeMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|solutionrelative:dopamine-fitness\\docs\\operations.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|c:\\\u043A\u043E\u0434\\vs\\dopamine\\dopamine-fitness\\migrations\\0003_db_hardening_indexes_triggers.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}",
+      "RelativeMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|solutionrelative:dopamine-fitness\\migrations\\0003_db_hardening_indexes_triggers.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|c:\\\u043A\u043E\u0434\\vs\\dopamine\\dopamine-fitness\\web\\tsconfig.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
@@ -29,14 +45,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|c:\\\u043A\u043E\u0434\\vs\\dopamine\\dopamine-fitness\\migrations\\0002_progress_unique_index.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}",
       "RelativeMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|solutionrelative:dopamine-fitness\\migrations\\0002_progress_unique_index.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|c:\\\u043A\u043E\u0434\\vs\\dopamine\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|c:\\\u043A\u043E\u0434\\vs\\dopamine\\dopamine-fitness\\package.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|solutionrelative:dopamine-fitness\\package.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|c:\\\u043A\u043E\u0434\\vs\\dopamine\\dopamine-fitness\\wrangler.toml||{8B382828-6202-11D1-8870-0000F87579D2}",
@@ -373,10 +381,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|c:\\\u043A\u043E\u0434\\vs\\dopamine\\dopamine-fitness\\scripts\\smoke.mjs||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
       "RelativeMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|solutionrelative:dopamine-fitness\\scripts\\smoke.mjs||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|c:\\\u043A\u043E\u0434\\vs\\dopamine\\dopamine-fitness\\docs\\operations.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
-      "RelativeMoniker": "D:0:0:{EBF36C74-86DB-44B8-809C-F30E72AECAA3}|Dopamine.csproj|solutionrelative:dopamine-fitness\\docs\\operations.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
     }
   ],
   "DocumentGroupContainers": [
@@ -386,63 +390,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 18,
+          "SelectedChildIndex": 8,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 84,
-              "Title": "ci-cd.yml",
-              "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\.github\\workflows\\ci-cd.yml",
-              "RelativeDocumentMoniker": "dopamine-fitness\\.github\\workflows\\ci-cd.yml",
-              "ToolTip": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\.github\\workflows\\ci-cd.yml",
-              "RelativeToolTip": "dopamine-fitness\\.github\\workflows\\ci-cd.yml",
-              "ViewState": "AgIAAFAAAAAAAAAAAIBJwH0AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
-              "WhenOpened": "2026-04-20T16:18:37.747Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 60,
-              "Title": "index.ts",
-              "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\i18n\\index.ts",
-              "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\i18n\\index.ts",
-              "ToolTip": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\i18n\\index.ts",
-              "RelativeToolTip": "dopamine-fitness\\web\\src\\i18n\\index.ts",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-04-20T16:02:57.773Z",
+              "DocumentIndex": 1,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-20T17:47:38.573Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 59,
-              "Title": "ru.json",
-              "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\i18n\\ru.json",
-              "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\i18n\\ru.json",
-              "ToolTip": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\i18n\\ru.json",
-              "RelativeToolTip": "dopamine-fitness\\web\\src\\i18n\\ru.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-04-20T16:02:57.637Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 58,
-              "Title": "en.json",
-              "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\i18n\\en.json",
-              "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\i18n\\en.json",
-              "ToolTip": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\i18n\\en.json",
-              "RelativeToolTip": "dopamine-fitness\\web\\src\\i18n\\en.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-04-20T16:02:56.883Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 57,
               "Title": "useUiSettings.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\features\\settings\\useUiSettings.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\features\\settings\\useUiSettings.ts",
@@ -455,7 +420,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 56,
+              "DocumentIndex": 58,
               "Title": "apiClient.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\services\\apiClient.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\services\\apiClient.ts",
@@ -468,7 +433,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 55,
+              "DocumentIndex": 57,
               "Title": "auth.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\services\\auth.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\services\\auth.ts",
@@ -481,7 +446,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 54,
+              "DocumentIndex": 56,
               "Title": "providers.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\app\\providers.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\app\\providers.tsx",
@@ -494,7 +459,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 53,
+              "DocumentIndex": 55,
               "Title": "router.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\app\\router.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\app\\router.tsx",
@@ -507,7 +472,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "index.html",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\index.html",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\index.html",
@@ -520,7 +485,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 93,
+              "DocumentIndex": 4,
               "Title": "OPERATIONS.md",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\docs\\OPERATIONS.md",
               "RelativeDocumentMoniker": "dopamine-fitness\\docs\\OPERATIONS.md",
@@ -533,7 +498,85 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 92,
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-20T14:48:11.989Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 60,
+              "Title": "en.json",
+              "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\i18n\\en.json",
+              "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\i18n\\en.json",
+              "ToolTip": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\i18n\\en.json",
+              "RelativeToolTip": "dopamine-fitness\\web\\src\\i18n\\en.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-20T16:02:56.883Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 61,
+              "Title": "ru.json",
+              "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\i18n\\ru.json",
+              "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\i18n\\ru.json",
+              "ToolTip": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\i18n\\ru.json",
+              "RelativeToolTip": "dopamine-fitness\\web\\src\\i18n\\ru.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-20T16:02:57.637Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "package.json",
+              "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\package.json",
+              "RelativeDocumentMoniker": "dopamine-fitness\\package.json",
+              "ToolTip": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\package.json",
+              "RelativeToolTip": "dopamine-fitness\\package.json",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABoAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-20T14:51:41.61Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 62,
+              "Title": "index.ts",
+              "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\i18n\\index.ts",
+              "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\i18n\\index.ts",
+              "ToolTip": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\i18n\\index.ts",
+              "RelativeToolTip": "dopamine-fitness\\web\\src\\i18n\\index.ts",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-04-20T16:02:57.773Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 86,
+              "Title": "ci-cd.yml",
+              "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\.github\\workflows\\ci-cd.yml",
+              "RelativeDocumentMoniker": "dopamine-fitness\\.github\\workflows\\ci-cd.yml",
+              "ToolTip": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\.github\\workflows\\ci-cd.yml",
+              "RelativeToolTip": "dopamine-fitness\\.github\\workflows\\ci-cd.yml",
+              "ViewState": "AgIAAFAAAAAAAAAAAIBJwH0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
+              "WhenOpened": "2026-04-20T16:18:37.747Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 94,
               "Title": "smoke.mjs",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\scripts\\smoke.mjs",
               "RelativeDocumentMoniker": "dopamine-fitness\\scripts\\smoke.mjs",
@@ -546,7 +589,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 91,
+              "DocumentIndex": 93,
               "Title": "tokenBlocklist.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\utils\\tokenBlocklist.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\utils\\tokenBlocklist.ts",
@@ -559,7 +602,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 90,
+              "DocumentIndex": 92,
               "Title": "apiErrors.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\services\\apiErrors.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\services\\apiErrors.ts",
@@ -572,7 +615,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 89,
+              "DocumentIndex": 91,
               "Title": "errorCodes.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\utils\\errorCodes.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\utils\\errorCodes.ts",
@@ -585,7 +628,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 88,
+              "DocumentIndex": 90,
               "Title": "appError.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\utils\\appError.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\utils\\appError.ts",
@@ -598,7 +641,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 87,
+              "DocumentIndex": 89,
               "Title": "dbErrors.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\utils\\dbErrors.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\utils\\dbErrors.ts",
@@ -611,7 +654,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 52,
+              "DocumentIndex": 54,
               "Title": "App.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\app\\App.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\app\\App.tsx",
@@ -624,7 +667,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 5,
               "Title": "0003_db_hardening_indexes_triggers.sql ",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\migrations\\0003_db_hardening_indexes_triggers.sql",
               "RelativeDocumentMoniker": "dopamine-fitness\\migrations\\0003_db_hardening_indexes_triggers.sql",
@@ -636,7 +679,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 85,
+              "DocumentIndex": 87,
               "Title": "env.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\config\\env.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\config\\env.ts",
@@ -649,7 +692,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 83,
+              "DocumentIndex": 85,
               "Title": "globals.css",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\styles\\globals.css",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\styles\\globals.css",
@@ -662,7 +705,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 82,
+              "DocumentIndex": 84,
               "Title": "tokens.css",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\styles\\tokens.css",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\styles\\tokens.css",
@@ -675,7 +718,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 81,
+              "DocumentIndex": 83,
               "Title": "themes.css",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\styles\\themes.css",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\styles\\themes.css",
@@ -688,7 +731,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 80,
+              "DocumentIndex": 82,
               "Title": "ProfilePage.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\pages\\ProfilePage.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\pages\\ProfilePage.tsx",
@@ -701,7 +744,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 79,
+              "DocumentIndex": 81,
               "Title": "SettingsPage.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\pages\\SettingsPage.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\pages\\SettingsPage.tsx",
@@ -714,7 +757,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 78,
+              "DocumentIndex": 80,
               "Title": "ProgressPage.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\pages\\ProgressPage.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\pages\\ProgressPage.tsx",
@@ -727,7 +770,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 77,
+              "DocumentIndex": 79,
               "Title": "MyExercisesPage.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\pages\\MyExercisesPage.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\pages\\MyExercisesPage.tsx",
@@ -740,7 +783,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 76,
+              "DocumentIndex": 78,
               "Title": "ExerciseCatalogPage.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\pages\\ExerciseCatalogPage.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\pages\\ExerciseCatalogPage.tsx",
@@ -753,7 +796,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 75,
+              "DocumentIndex": 77,
               "Title": "ExerciseDetailsPage.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\pages\\ExerciseDetailsPage.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\pages\\ExerciseDetailsPage.tsx",
@@ -766,7 +809,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 74,
+              "DocumentIndex": 76,
               "Title": "WorkoutDetailsPage.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\pages\\WorkoutDetailsPage.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\pages\\WorkoutDetailsPage.tsx",
@@ -779,7 +822,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 73,
+              "DocumentIndex": 75,
               "Title": "AuthPage.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\pages\\AuthPage.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\pages\\AuthPage.tsx",
@@ -792,7 +835,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 72,
+              "DocumentIndex": 74,
               "Title": "HomePage.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\pages\\HomePage.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\pages\\HomePage.tsx",
@@ -805,7 +848,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 71,
+              "DocumentIndex": 73,
               "Title": "DashboardPage.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\pages\\DashboardPage.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\pages\\DashboardPage.tsx",
@@ -818,7 +861,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 70,
+              "DocumentIndex": 72,
               "Title": "WorkoutsPage.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\pages\\WorkoutsPage.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\pages\\WorkoutsPage.tsx",
@@ -831,7 +874,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 69,
+              "DocumentIndex": 71,
               "Title": "useExercises.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\features\\exercises\\useExercises.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\features\\exercises\\useExercises.ts",
@@ -844,7 +887,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 68,
+              "DocumentIndex": 70,
               "Title": "useAuth.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\features\\auth\\useAuth.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\features\\auth\\useAuth.ts",
@@ -857,7 +900,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 67,
+              "DocumentIndex": 69,
               "Title": "useSettings.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\features\\settings\\useSettings.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\features\\settings\\useSettings.ts",
@@ -870,7 +913,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 66,
+              "DocumentIndex": 68,
               "Title": "useProgress.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\features\\progress\\useProgress.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\features\\progress\\useProgress.ts",
@@ -883,7 +926,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 65,
+              "DocumentIndex": 67,
               "Title": "useWorkouts.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\features\\workouts\\useWorkouts.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\features\\workouts\\useWorkouts.ts",
@@ -896,7 +939,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 64,
+              "DocumentIndex": 66,
               "Title": "ProgressChart.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\components\\charts\\ProgressChart.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\components\\charts\\ProgressChart.tsx",
@@ -909,7 +952,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 63,
+              "DocumentIndex": 65,
               "Title": "Button.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\components\\ui\\Button.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\components\\ui\\Button.tsx",
@@ -922,7 +965,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 62,
+              "DocumentIndex": 64,
               "Title": "AppLayout.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\components\\layout\\AppLayout.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\components\\layout\\AppLayout.tsx",
@@ -935,7 +978,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 51,
+              "DocumentIndex": 53,
               "Title": "main.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\main.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\main.tsx",
@@ -948,7 +991,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 61,
+              "DocumentIndex": 63,
               "Title": "Card.tsx",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\src\\components\\ui\\Card.tsx",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\src\\components\\ui\\Card.tsx",
@@ -961,7 +1004,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 50,
+              "DocumentIndex": 52,
               "Title": "vite.config.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\vite.config.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\vite.config.ts",
@@ -974,7 +1017,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 49,
+              "DocumentIndex": 51,
               "Title": "tsconfig.app.json",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\tsconfig.app.json",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\tsconfig.app.json",
@@ -987,7 +1030,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 6,
               "Title": "tsconfig.json",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\tsconfig.json",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\tsconfig.json",
@@ -1000,7 +1043,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 7,
               "Title": "package.json",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\web\\package.json",
               "RelativeDocumentMoniker": "dopamine-fitness\\web\\package.json",
@@ -1013,7 +1056,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 8,
               "Title": "seed.sql ",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\seeders\\seed.sql",
               "RelativeDocumentMoniker": "dopamine-fitness\\seeders\\seed.sql",
@@ -1025,7 +1068,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 19,
               "Title": "jwt.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\utils\\jwt.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\utils\\jwt.ts",
@@ -1038,7 +1081,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 17,
               "Title": "rateLimiter.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\middlewares\\rateLimiter.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\middlewares\\rateLimiter.ts",
@@ -1051,7 +1094,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 16,
               "Title": "requestId.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\middlewares\\requestId.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\middlewares\\requestId.ts",
@@ -1064,7 +1107,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 15,
               "Title": "errorHandler.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\middlewares\\errorHandler.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\middlewares\\errorHandler.ts",
@@ -1077,7 +1120,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 14,
               "Title": "index.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\index.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\index.ts",
@@ -1090,7 +1133,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 13,
               "Title": "index.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\types\\index.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\types\\index.ts",
@@ -1103,7 +1146,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 12,
               "Title": "tsconfig.json",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\tsconfig.json",
               "RelativeDocumentMoniker": "dopamine-fitness\\tsconfig.json",
@@ -1116,20 +1159,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-20T14:48:11.989Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 11,
               "Title": "wrangler.toml",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\wrangler.toml",
               "RelativeDocumentMoniker": "dopamine-fitness\\wrangler.toml",
@@ -1142,7 +1172,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 10,
               "Title": "0002_progress_unique_index.sql ",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\migrations\\0002_progress_unique_index.sql",
               "RelativeDocumentMoniker": "dopamine-fitness\\migrations\\0002_progress_unique_index.sql",
@@ -1154,7 +1184,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 47,
+              "DocumentIndex": 49,
               "Title": "favorites.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\routes\\favorites.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\routes\\favorites.ts",
@@ -1167,7 +1197,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 46,
+              "DocumentIndex": 48,
               "Title": "favoritesRepository.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\repositories\\favoritesRepository.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\repositories\\favoritesRepository.ts",
@@ -1180,7 +1210,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 45,
+              "DocumentIndex": 47,
               "Title": "index.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\storage\\index.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\storage\\index.ts",
@@ -1193,7 +1223,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 44,
+              "DocumentIndex": 46,
               "Title": "README.md",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\README.md",
               "RelativeDocumentMoniker": "dopamine-fitness\\README.md",
@@ -1206,7 +1236,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 43,
+              "DocumentIndex": 45,
               "Title": ".env.example",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\.env.example",
               "RelativeDocumentMoniker": "dopamine-fitness\\.env.example",
@@ -1219,7 +1249,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 42,
+              "DocumentIndex": 44,
               "Title": ".gitignore",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\.gitignore",
               "RelativeDocumentMoniker": "dopamine-fitness\\.gitignore",
@@ -1232,7 +1262,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 41,
+              "DocumentIndex": 43,
               "Title": "uploads.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\routes\\uploads.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\routes\\uploads.ts",
@@ -1245,7 +1275,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 40,
+              "DocumentIndex": 42,
               "Title": "customExercises.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\routes\\customExercises.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\routes\\customExercises.ts",
@@ -1258,7 +1288,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 39,
+              "DocumentIndex": 41,
               "Title": "profile.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\routes\\profile.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\routes\\profile.ts",
@@ -1271,7 +1301,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 38,
+              "DocumentIndex": 40,
               "Title": "settings.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\routes\\settings.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\routes\\settings.ts",
@@ -1284,7 +1314,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 37,
+              "DocumentIndex": 39,
               "Title": "stats.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\routes\\stats.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\routes\\stats.ts",
@@ -1297,7 +1327,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 36,
+              "DocumentIndex": 38,
               "Title": "exercises.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\routes\\exercises.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\routes\\exercises.ts",
@@ -1310,7 +1340,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 35,
+              "DocumentIndex": 37,
               "Title": "workouts.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\routes\\workouts.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\routes\\workouts.ts",
@@ -1323,7 +1353,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 34,
+              "DocumentIndex": 36,
               "Title": "auth.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\routes\\auth.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\routes\\auth.ts",
@@ -1336,7 +1366,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 33,
+              "DocumentIndex": 35,
               "Title": "client.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\integrations\\wger\\client.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\integrations\\wger\\client.ts",
@@ -1349,7 +1379,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 32,
+              "DocumentIndex": 34,
               "Title": "client.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\integrations\\exercisedb\\client.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\integrations\\exercisedb\\client.ts",
@@ -1362,7 +1392,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 31,
+              "DocumentIndex": 33,
               "Title": "statsService.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\services\\statsService.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\services\\statsService.ts",
@@ -1375,7 +1405,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 32,
               "Title": "exerciseService.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\services\\exerciseService.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\services\\exerciseService.ts",
@@ -1388,7 +1418,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 31,
               "Title": "workoutService.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\services\\workoutService.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\services\\workoutService.ts",
@@ -1401,7 +1431,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
+              "DocumentIndex": 30,
               "Title": "authService.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\services\\authService.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\services\\authService.ts",
@@ -1414,7 +1444,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 29,
               "Title": "statsRepository.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\repositories\\statsRepository.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\repositories\\statsRepository.ts",
@@ -1427,7 +1457,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 28,
               "Title": "exerciseRepository.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\repositories\\exerciseRepository.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\repositories\\exerciseRepository.ts",
@@ -1440,7 +1470,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 27,
               "Title": "workoutRepository.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\repositories\\workoutRepository.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\repositories\\workoutRepository.ts",
@@ -1453,7 +1483,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 26,
               "Title": "userRepository.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\repositories\\userRepository.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\repositories\\userRepository.ts",
@@ -1466,20 +1496,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "package.json",
-              "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\package.json",
-              "RelativeDocumentMoniker": "dopamine-fitness\\package.json",
-              "ToolTip": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\package.json",
-              "RelativeToolTip": "dopamine-fitness\\package.json",
-              "ViewState": "AgIAAAwAAAAAAAAAAABBwCcAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-04-20T14:51:41.61Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 9,
               "Title": "0001_initial_schema.sql ",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\migrations\\0001_initial_schema.sql",
               "RelativeDocumentMoniker": "dopamine-fitness\\migrations\\0001_initial_schema.sql",
@@ -1491,7 +1508,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 23,
               "Title": "validate.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\validators\\validate.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\validators\\validate.ts",
@@ -1504,7 +1521,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 22,
               "Title": "schemas.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\validators\\schemas.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\validators\\schemas.ts",
@@ -1517,7 +1534,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 21,
               "Title": "helpers.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\utils\\helpers.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\utils\\helpers.ts",
@@ -1530,7 +1547,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 20,
               "Title": "password.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\utils\\password.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\utils\\password.ts",
@@ -1543,7 +1560,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 18,
               "Title": "authenticate.ts",
               "DocumentMoniker": "C:\\\u041A\u043E\u0434\\vs\\Dopamine\\dopamine-fitness\\src\\middlewares\\authenticate.ts",
               "RelativeDocumentMoniker": "dopamine-fitness\\src\\middlewares\\authenticate.ts",
