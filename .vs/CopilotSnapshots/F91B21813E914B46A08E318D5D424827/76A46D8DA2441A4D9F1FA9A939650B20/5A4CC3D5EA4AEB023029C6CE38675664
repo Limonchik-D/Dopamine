@@ -1,0 +1,16 @@
+﻿import { ZodSchema, ZodError } from "zod";
+
+export function validate<T>(schema: ZodSchema<T>, data: unknown): T {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    const messages = formatZodErrors(result.error);
+    throw new Error(`Validation: ${messages}`);
+  }
+  return result.data;
+}
+
+export function formatZodErrors(error: ZodError): string {
+  return error.errors
+    .map((e) => `${e.path.join(".")}: ${e.message}`)
+    .join("; ");
+}

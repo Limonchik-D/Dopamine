@@ -1,0 +1,61 @@
+﻿import type { Env } from "../types/index.js";
+
+export interface AppConfig {
+  environment: Env["ENVIRONMENT"];
+  appName: string;
+  jwt: {
+    secret: string;
+    expiresInSeconds: number;
+  };
+  exercise: {
+    cacheTtlSeconds: number;
+    exerciseDbBaseUrl: string;
+    exerciseDbApiKey: string;
+    wgerBaseUrl: string;
+  };
+  uploads: {
+    maxSizeMb: number;
+  };
+}
+
+let cachedConfig: AppConfig | null = null;
+
+function requireString(name: keyof Env, value: string | undefined): string {
+  const normalized = value?.trim();
+  if (!normalized) {
+    throw new Error(`Missing required env variable: ${String(name)}`);
+  }
+  return normalized;
+}
+
+function requirePositiveInt(name: keyof Env, value: string | undefined): number {
+  const parsed = Number.parseInt(requireString(name, value), 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    throw new Error(`Invalid env variable ${String(name)}. Expected positive integer.`);
+  }
+  return parsed;
+}
+
+export function getAppConfig(env: Env): AppConfig {
+  if (cachedConfig) return cachedConfig;
+
+  cachedConfig = {
+    environment: env.ENVIRONMENT,
+    appName: requireString("APP_NAME", env.APP_NAME),
+    jwt: {
+      secret: requireString("JWT_SECRET", env.JWT_SECRET),
+      expiresInSeconds: requirePositiveInt("JWT_EXPIRES_IN", env.JWT_EXPIRES_IN),
+    },
+    exercise: {
+      cacheTtlSeconds: requirePositiveInt("EXERCISE_CACHE_TTL", env.EXERCISE_CACHE_TTL),
+      exerciseDbBaseUrl: requireString("EXERCISEDB_BASE_URL", env.EXERCISEDB_BASE_URL),
+      exerciseDbApiKey: requireString("EXERCISEDB_API_KEY", env.EXERCISEDB_API_KEY),
+      wgerBaseUrl: requireString("WGER_BASE_URL", env.WGER_BASE_URL),
+    },
+    uploads: {
+      maxSizeMb: requirePositiveInt("MAX_UPLOAD_SIZE_MB", env.MAX_UPLOAD_SIZE_MB),
+    },
+  };
+
+  return cachedConfig;
+}

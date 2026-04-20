@@ -1,0 +1,63 @@
+import { Hono } from "hono";
+import type { Env, HonoVariables, UserSettings } from "../types/index.js";
+import { authenticate } from "../middlewares/authenticate.js";
+import { validate } from "../validators/validate.js";
+import { settingsSchema } from "../validators/schemas.js";
+
+export const settingsRoutes = new Hono<{ Bindings: Env; Variables: HonoVariables }>();
+
+settingsRoutes.use("*", authenticate());
+
+settingsRoutes.get("/", async (c) => {
+  const userId = c.get("userId") as number;
+
+  const settings = await c.env.DB
+    .prepare("SELECT * FROM user_settings WHERE user_id = ?1")
+    .bind(userId)
+    .first<UserSettings>();
+
+  return c.json({ success: true, data: settings });
+});
+
+settingsRoutes.patch("/", async (c) => {
+  const userId = c.get("userId") as number;
+  const input = validate(settingsSchema, await c.req.json());
+
+  const sets: string[] = [];
+  const values: unknown[] = [];
+  let i = 1;
+
+  if (input.theme !== undefined) { sets.push(`theme = ?${i++}`); values.push(input.theme); }
+  if (input.locale !== undefined) { sets.push(`locale = ?${i++}`); values.push(input.locale); }
+  if (input.units !== undefined) { sets.push(`units = ?${i++}`); values.push(input.units); }
+  if (input.notifications_enabled !== undefined) {
+    sets.push(`notifications_enabled = ?${i++}`);
+    values.push(input.notifications_enabled ? 1 : 0);
+  }
+
+  if (sets.length === 0) {
+    const settings = await c.env.DB
+      .prepare("SELECT * FROM user_settings WHERE user_id = ?1")
+      .bind(userId)
+      .first<UserSettings>();
+    return c.json({ success: true, data: settings });
+  }
+
+  values.push(userId);
+  await c.env.DB
+    .prepare(`UPDATE user_settings SET ${sets.join(", ")} WHERE user_id = ?${i}`)
+    .bind(...values)
+    .run();
+
+  // Invalidate KV cache for user settings
+  await c.env.KV.delete(`settings:${userId}`);
+
+  const updated = await c.env.DB
+    .prepare("SELECT * FROM user_settings WHERE user_id = ?1")
+    .bind(userId)
+    .first<UserSettings>();
+
+  return c.json({ success: true, data: updated });
+});
+
+

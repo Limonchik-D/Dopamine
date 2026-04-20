@@ -1,0 +1,72 @@
+﻿export interface FavoriteItem {
+  id: number;
+  user_id: number;
+  exercise_id: number | null;
+  custom_exercise_id: number | null;
+  created_at: string;
+}
+
+export class FavoritesRepository {
+  constructor(private db: D1Database) {}
+
+  async list(userId: number): Promise<FavoriteItem[]> {
+    const rows = await this.db
+      .prepare(
+        `SELECT f.*, ec.name_en, ec.name_ru, ec.target, ec.gif_url
+         FROM favorites f
+         LEFT JOIN exercise_catalog ec ON ec.id = f.exercise_id
+         WHERE f.user_id = ?1
+         ORDER BY f.created_at DESC`
+      )
+      .bind(userId)
+      .all<FavoriteItem>();
+    return rows.results;
+  }
+
+  async add(
+    userId: number,
+    exerciseId: number | null,
+    customExerciseId: number | null
+  ): Promise<FavoriteItem> {
+    const row = await this.db
+      .prepare(
+        `INSERT OR IGNORE INTO favorites (user_id, exercise_id, custom_exercise_id)
+         VALUES (?1, ?2, ?3)
+         RETURNING *`
+      )
+      .bind(userId, exerciseId, customExerciseId)
+      .first<FavoriteItem>();
+    if (!row) throw new Error("Already in favorites or invalid exercise");
+    return row;
+  }
+
+  async remove(
+    userId: number,
+    exerciseId: number | null,
+    customExerciseId: number | null
+  ): Promise<boolean> {
+    const condition = exerciseId
+      ? "exercise_id = ?3 AND custom_exercise_id IS NULL"
+      : "custom_exercise_id = ?3 AND exercise_id IS NULL";
+    const result = await this.db
+      .prepare(`DELETE FROM favorites WHERE user_id = ?1 AND user_id = ?2 AND ${condition}`)
+      .bind(userId, userId, exerciseId ?? customExerciseId)
+      .run();
+    return (result.meta.changes ?? 0) > 0;
+  }
+
+  async isFavorite(
+    userId: number,
+    exerciseId: number | null,
+    customExerciseId: number | null
+  ): Promise<boolean> {
+    const condition = exerciseId
+      ? "exercise_id = ?2"
+      : "custom_exercise_id = ?2";
+    const row = await this.db
+      .prepare(`SELECT 1 FROM favorites WHERE user_id = ?1 AND ${condition}`)
+      .bind(userId, exerciseId ?? customExerciseId)
+      .first();
+    return row != null;
+  }
+}

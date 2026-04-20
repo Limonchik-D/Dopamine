@@ -1,0 +1,34 @@
+﻿import { Navigate, Route, Routes } from "react-router-dom";
+import { AppLayout } from "../components/layout/AppLayout";
+import { HomePage } from "../pages/HomePage";
+import { AuthPage } from "../pages/AuthPage";
+import { DashboardPage } from "../pages/DashboardPage";
+import { WorkoutsPage } from "../pages/WorkoutsPage";
+import { WorkoutDetailsPage } from "../pages/WorkoutDetailsPage";
+import { ExerciseCatalogPage } from "../pages/ExerciseCatalogPage";
+import { ExerciseDetailsPage } from "../pages/ExerciseDetailsPage";
+import { MyExercisesPage } from "../pages/MyExercisesPage";
+import { ProgressPage } from "../pages/ProgressPage";
+import { SettingsPage } from "../pages/SettingsPage";
+import { ProfilePage } from "../pages/ProfilePage";
+
+export function AppRouter() {
+  return (
+    <Routes>
+      <Route path="/" element={<AppLayout />}>
+        <Route index element={<HomePage />} />
+        <Route path="auth" element={<AuthPage />} />
+        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="workouts" element={<WorkoutsPage />} />
+        <Route path="workouts/:id" element={<WorkoutDetailsPage />} />
+        <Route path="exercises" element={<ExerciseCatalogPage />} />
+        <Route path="exercises/:id" element={<ExerciseDetailsPage />} />
+        <Route path="my-exercises" element={<MyExercisesPage />} />
+        <Route path="progress" element={<ProgressPage />} />
+        <Route path="settings" element={<SettingsPage />} />
+        <Route path="profile" element={<ProfilePage />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}

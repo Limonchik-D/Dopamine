@@ -1,0 +1,50 @@
+import { FormEvent, useState } from "react";
+import { useLogin, useRegister } from "../features/auth/useAuth";
+import { Button } from "../components/ui/Button";
+import { Card } from "../components/ui/Card";
+import { toDiagnosticSuffix, toUserMessage } from "../services/apiErrors";
+
+export function AuthPage() {
+  const [isRegister, setIsRegister] = useState(false);
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorText, setErrorText] = useState("");
+
+  const login = useLogin();
+  const register = useRegister();
+
+  const onSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setErrorText("");
+    try {
+      if (isRegister) {
+        await register.mutateAsync({ email, username, password });
+      } else {
+        await login.mutateAsync({ email, password });
+      }
+    } catch (error) {
+      setErrorText(`${toUserMessage(error)}${toDiagnosticSuffix(error)}`);
+    }
+  };
+
+  return (
+    <Card>
+      <h2>{isRegister ? "Регистрация" : "Вход"}</h2>
+      <form onSubmit={onSubmit} className="stack">
+        <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
+        {isRegister && (
+          <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" />
+        )}
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Пароль" />
+        <Button type="submit" disabled={login.isPending || register.isPending}>
+          {isRegister ? "Создать аккаунт" : "Войти"}
+        </Button>
+        {errorText && <p className="error-text">{errorText}</p>}
+      </form>
+      <Button type="button" onClick={() => setIsRegister((x) => !x)}>
+        {isRegister ? "У меня уже есть аккаунт" : "Создать аккаунт"}
+      </Button>
+    </Card>
+  );
+}

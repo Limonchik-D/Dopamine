@@ -1,0 +1,76 @@
+import type { Context } from "hono";
+import type { Env, HonoVariables } from "../types/index.js";
+import { AppError } from "../utils/appError.js";
+import { ErrorCodes } from "../utils/errorCodes.js";
+
+export function errorHandler(err: Error, c: Context<{ Bindings: Env; Variables: HonoVariables }>) {
+  const requestId = c.get("requestId") as string | undefined;
+
+  console.error(`[${requestId ?? "?"}] Unhandled error:`, {
+    message: err.message,
+    stack: c.env.ENVIRONMENT !== "production" ? err.stack : undefined,
+    path: c.req.path,
+    method: c.req.method,
+  });
+
+  if (err.message.startsWith("Validation:")) {
+    return c.json(
+      {
+        success: false,
+        error: err.message.replace("Validation: ", ""),
+        code: ErrorCodes.ValidationError,
+        requestId,
+      },
+      400
+    );
+  }
+
+  if (err.message.startsWith("Conflict:")) {
+    return c.json(
+      {
+        success: false,
+        error: err.message.replace("Conflict: ", ""),
+        code: ErrorCodes.Conflict,
+        requestId,
+      },
+      409
+    );
+  }
+
+  if (err instanceof AppError) {
+    return c.json(
+      {
+        success: false,
+        error: err.message,
+        code: err.code,
+        requestId,
+      },
+      err.status
+    );
+  }
+
+  if (err.message === "Unauthorized") {
+    return c.json({ success: false, error: "Unauthorized", code: ErrorCodes.Unauthorized, requestId }, 401);
+  }
+
+  if (err.message === "Forbidden") {
+    return c.json({ success: false, error: "Forbidden", code: ErrorCodes.Forbidden, requestId }, 403);
+  }
+
+  if (err.message === "Not found") {
+    return c.json({ success: false, error: "Not found", code: ErrorCodes.NotFound, requestId }, 404);
+  }
+
+  return c.json(
+    {
+      success: false,
+      error:
+        c.env.ENVIRONMENT === "production"
+          ? "Internal server error"
+          : err.message,
+      code: ErrorCodes.InternalError,
+      requestId,
+    },
+    500
+  );
+}

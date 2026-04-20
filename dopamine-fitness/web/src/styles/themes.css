@@ -1,0 +1,36 @@
+:root,
+:root[data-theme="calm"] {
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --text: #1e2a38;
+  --muted: #6b7280;
+  --accent: #4f46e5;
+  --border: #e5e7eb;
+}
+
+:root[data-theme="sport"] {
+  --bg: #fff8f1;
+  --surface: #ffffff;
+  --text: #202020;
+  --muted: #666666;
+  --accent: #ef4444;
+  --border: #f1d5c7;
+}
+
+:root[data-theme="minimal"] {
+  --bg: #f8f8f8;
+  --surface: #ffffff;
+  --text: #111111;
+  --muted: #666666;
+  --accent: #111111;
+  --border: #d9d9d9;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0f1115;
+  --surface: #161a22;
+  --text: #f3f4f6;
+  --muted: #9ca3af;
+  --accent: #60a5fa;
+  --border: #303847;
+}

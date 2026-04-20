@@ -1,0 +1,15 @@
+{
+  "app.title": "Dopamine Fitness",
+  "nav.home": "Главная",
+  "nav.dashboard": "Дашборд",
+  "nav.workouts": "Тренировки",
+  "nav.exercises": "Упражнения",
+  "nav.progress": "Прогресс",
+  "nav.settings": "Настройки",
+  "nav.profile": "Профиль",
+  "cta.start": "Начать",
+  "auth.login": "Вход",
+  "auth.register": "Регистрация",
+  "workouts.new": "Новая тренировка",
+  "empty.default": "Пока пусто"
+}

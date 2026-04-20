@@ -1,0 +1,38 @@
+import { ApiClientError } from "./apiClient";
+
+const messagesByCode: Record<string, string> = {
+  VALIDATION_ERROR: "Проверьте корректность заполненных полей.",
+  UNAUTHORIZED: "Нужно войти в аккаунт.",
+  INVALID_TOKEN: "Сессия истекла. Войдите снова.",
+  TOKEN_REVOKED: "Сессия завершена. Войдите снова.",
+  RATE_LIMITED: "Слишком много запросов. Подождите немного.",
+  AUTH_RATE_LIMITED: "Слишком много попыток входа. Попробуйте через минуту.",
+  FORBIDDEN: "Недостаточно прав для выполнения действия.",
+  NOT_FOUND: "Запрошенные данные не найдены.",
+  SET_DUPLICATE: "Такой номер подхода уже есть. Измените номер.",
+  FAVORITE_DUPLICATE: "Это упражнение уже в избранном.",
+  FAVORITE_INVALID_REFERENCE: "Нельзя добавить недоступное упражнение.",
+  FAVORITE_NOT_FOUND: "Запись в избранном уже удалена.",
+};
+
+export function toUserMessage(error: unknown): string {
+  if (error instanceof ApiClientError) {
+    if (error.code && messagesByCode[error.code]) {
+      return messagesByCode[error.code];
+    }
+    return error.message;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return "Произошла ошибка. Попробуйте ещё раз.";
+}
+
+export function toDiagnosticSuffix(error: unknown): string {
+  if (error instanceof ApiClientError && error.requestId) {
+    return ` (requestId: ${error.requestId})`;
+  }
+  return "";
+}
