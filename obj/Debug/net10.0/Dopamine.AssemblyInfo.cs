@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Dopamine")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+767a0d45a3ca67e09dc60d653c4b68d3153ceaa1")]
 [assembly: System.Reflection.AssemblyProductAttribute("Dopamine")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Dopamine")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
