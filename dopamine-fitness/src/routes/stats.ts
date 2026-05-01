@@ -4,6 +4,7 @@ import type { Env, HonoVariables } from "../types/index.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { StatsService } from "../services/statsService.js";
 import { getAppConfig } from "../config/env.js";
+import { statsCacheKey } from "../utils/cacheKeys.js";
 
 export const statsRoutes = new Hono<{ Bindings: Env; Variables: HonoVariables }>();
 
@@ -14,7 +15,7 @@ type AppContext = Context<{ Bindings: Env; Variables: HonoVariables }>;
 
 async function handleStatsPeriod(c: AppContext, period: StatsPeriod) {
   const userId = c.get("userId") as number;
-  const cacheKey = `stats:${userId}:${period}`;
+  const cacheKey = statsCacheKey(userId, period);
   const config = getAppConfig(c.env);
 
   const cached = await c.env.KV.get(cacheKey, "json");

@@ -4,6 +4,7 @@ import { authenticate } from "../middlewares/authenticate.js";
 import { validate } from "../validators/validate.js";
 import { checkinSchema } from "../validators/schemas.js";
 import { getAppConfig } from "../config/env.js";
+import { checkinsCacheKey } from "../utils/cacheKeys.js";
 
 export const checkinRoutes = new Hono<{ Bindings: Env; Variables: HonoVariables }>();
 
@@ -16,7 +17,7 @@ function formatDateKeyUtc(date: Date) {
 checkinRoutes.get("/", async (c) => {
   const userId = c.get("userId") as number;
   const config = getAppConfig(c.env);
-  const cacheKey = `checkins:${userId}`;
+  const cacheKey = checkinsCacheKey(userId);
 
   const cached = await c.env.KV.get(cacheKey, "json");
   if (cached) {
@@ -69,7 +70,7 @@ checkinRoutes.post("/", async (c) => {
     .bind(userId, checkinDate)
     .run();
 
-  await c.env.KV.delete(`checkins:${userId}`);
+  await c.env.KV.delete(checkinsCacheKey(userId));
 
   const checkin = await c.env.DB
     .prepare(

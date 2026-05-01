@@ -1,5 +1,5 @@
 import { Card } from "../components/ui/Card";
-import { useAdminOverview, useAdminUsers } from "../features/admin/useAdmin";
+import { useAdminDiagnostics, useAdminOverview, useAdminUsers } from "../features/admin/useAdmin";
 import { useMe } from "../features/auth/useAuth";
 
 export function AdminPage() {
@@ -8,6 +8,7 @@ export function AdminPage() {
 
   const overview = useAdminOverview(isAdmin);
   const users = useAdminUsers(isAdmin);
+  const diagnostics = useAdminDiagnostics(isAdmin);
 
   if (meLoading) {
     return (
@@ -31,6 +32,11 @@ export function AdminPage() {
     <div className="stack">
       <Card>
         <h2>Админ панель</h2>
+        {diagnostics.data && (
+          <p className="daily-checkin-subtitle">
+            Система: {diagnostics.data.ready ? "готова" : "degraded"} · DB: {diagnostics.data.dependencies.db ? "ok" : "fail"} · KV: {diagnostics.data.dependencies.kv ? "ok" : "fail"}
+          </p>
+        )}
         {overview.isLoading ? (
           <p>Загрузка метрик...</p>
         ) : (
@@ -47,6 +53,29 @@ export function AdminPage() {
               <p className="daily-stat-label">Кастом упражнения</p>
               <p className="daily-stat-value">{overview.data?.customExercises ?? 0}</p>
             </div>
+          </div>
+        )}
+      </Card>
+
+      <Card>
+        <h3>Диагностика и масштабирование</h3>
+        {diagnostics.isLoading ? (
+          <p>Загрузка диагностики...</p>
+        ) : (
+          <div className="stack">
+            <div className="daily-stats-row">
+              <div className="daily-stat-tile">
+                <p className="daily-stat-label">Check-ins</p>
+                <p className="daily-stat-value">{diagnostics.data?.counters.checkins ?? 0}</p>
+              </div>
+              <div className="daily-stat-tile">
+                <p className="daily-stat-label">Последняя миграция</p>
+                <p className="daily-stat-value" style={{ fontSize: "var(--font-md)" }}>{diagnostics.data?.latestMigration?.name ?? "n/a"}</p>
+              </div>
+            </div>
+            <p className="daily-checkin-subtitle">
+              Обновлено: {diagnostics.data ? new Date(diagnostics.data.ts).toLocaleString("ru-RU") : "n/a"}
+            </p>
           </div>
         )}
       </Card>

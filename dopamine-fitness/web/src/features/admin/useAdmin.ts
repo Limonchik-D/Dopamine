@@ -15,6 +15,24 @@ export type AdminUser = {
   created_at: string;
 };
 
+export type AdminDiagnostics = {
+  ready: boolean;
+  dependencies: {
+    db: boolean;
+    kv: boolean;
+  };
+  counters: {
+    users: number;
+    workouts: number;
+    checkins: number;
+  };
+  latestMigration: {
+    name: string;
+    applied_at: string;
+  } | null;
+  ts: string;
+};
+
 export function useAdminOverview(enabled: boolean) {
   return useQuery({
     queryKey: ["admin-overview"],
@@ -28,5 +46,15 @@ export function useAdminUsers(enabled: boolean) {
     queryKey: ["admin-users"],
     queryFn: () => apiClient.get<{ users: AdminUser[]; total: number }>("/admin/users"),
     enabled,
+  });
+}
+
+export function useAdminDiagnostics(enabled: boolean) {
+  return useQuery({
+    queryKey: ["admin-diagnostics"],
+    queryFn: () => apiClient.get<AdminDiagnostics>("/admin/diagnostics"),
+    enabled,
+    refetchInterval: enabled ? 60_000 : false,
+    staleTime: 30_000,
   });
 }

@@ -79,6 +79,13 @@ if (authToken) {
       headers: authHeaders,
     });
   });
+
+  await check("admin diagnostics endpoint (role dependent)", async () => {
+    await expectStatus("/api/admin/diagnostics", [200, 403], {
+      method: "GET",
+      headers: authHeaders,
+    });
+  });
 }
 
 if (process.exitCode && process.exitCode !== 0) {
