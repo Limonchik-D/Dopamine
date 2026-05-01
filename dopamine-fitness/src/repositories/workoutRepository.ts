@@ -124,7 +124,23 @@ export class WorkoutRepository {
   async getExercises(workoutId: number): Promise<WorkoutExercise[]> {
     const rows = await this.db
       .prepare(
-        "SELECT * FROM workout_exercises WHERE workout_id = ?1 ORDER BY order_index ASC"
+        `SELECT
+           we.*,
+           COALESCE(ec.name_ru, ec.name_en)  AS exercise_name,
+           ec.gif_url                         AS exercise_gif_url,
+           ec.target                          AS exercise_target,
+           ec.equipment                       AS exercise_equipment,
+           NULL                               AS exercise_photo_key,
+           0                                  AS is_custom,
+           cx.name                            AS custom_name,
+           cx.photo_r2_key                    AS custom_photo_key,
+           cx.target                          AS custom_target,
+           cx.equipment                       AS custom_equipment
+         FROM workout_exercises we
+         LEFT JOIN exercise_catalog ec ON ec.id = we.exercise_id
+         LEFT JOIN custom_exercises cx ON cx.id = we.custom_exercise_id
+         WHERE we.workout_id = ?1
+         ORDER BY we.order_index ASC`
       )
       .bind(workoutId)
       .all<WorkoutExercise>();

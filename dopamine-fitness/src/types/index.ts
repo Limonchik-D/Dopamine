@@ -146,6 +146,15 @@ export interface WorkoutExercise {
   target_muscle: string | null;
   equipment: string | null;
   created_at: string;
+  // Joined enrichment fields (present when loaded via getExercises JOIN)
+  exercise_name?: string | null;
+  exercise_gif_url?: string | null;
+  exercise_target?: string | null;
+  exercise_equipment?: string | null;
+  custom_name?: string | null;
+  custom_photo_key?: string | null;
+  custom_target?: string | null;
+  custom_equipment?: string | null;
 }
 
 export interface Set {

@@ -28,7 +28,16 @@ export type WorkoutExerciseEntry = {
   order_index: number;
   target_muscle: string | null;
   equipment: string | null;
+  // Joined fields from exercise_catalog
   exercise_name?: string | null;
+  exercise_gif_url?: string | null;
+  exercise_target?: string | null;
+  exercise_equipment?: string | null;
+  // Joined fields from custom_exercises
+  custom_name?: string | null;
+  custom_photo_key?: string | null;
+  custom_target?: string | null;
+  custom_equipment?: string | null;
   sets: WorkoutSet[];
 };
 
