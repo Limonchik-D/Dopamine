@@ -53,14 +53,14 @@ export function DashboardPage() {
 
   return (
     <div className="stack">
-      {/* Welcome */}
+      {/* Welcome hero */}
       <div className="dashboard-welcome">
         <div>
           <h2 className="dashboard-greeting">
-            Привет{me?.username ? `, ${me.username}` : ""}! 👋
+            {checkedInToday ? "Так держать! 🔥" : `Привет${me?.username ? `, ${me.username}` : ""}! 👋`}
           </h2>
-          <p className="text-muted dashboard-subline">
-            {checkedInToday ? "Сегодня уже отмечено. Так держать!" : "Не забудь отметить сегодняшний день."}
+          <p className="dashboard-subline">
+            {checkedInToday ? "День уже отмечен. Продолжай в том же духе!" : "Отметь сегодняшний день и сохрани серию."}
           </p>
         </div>
         <Button onClick={checkInToday} disabled={checkedInToday || checkinsLoading}>

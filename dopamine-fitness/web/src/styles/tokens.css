@@ -1,13 +1,14 @@
 :root {
-  --radius-md: 22px;
-  --radius-lg: 28px;
-  --radius-xl: 34px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
   --space-xs: 6px;
   --space-sm: 10px;
   --space-md: 16px;
   --space-lg: 24px;
-  --space-xl: 32px;
-  --font-sm: 14px;
-  --font-md: 16px;
+  --space-xl: 40px;
+  --font-sm: 13px;
+  --font-md: 15px;
   --font-lg: 20px;
 }

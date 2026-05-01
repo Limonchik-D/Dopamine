@@ -19,7 +19,7 @@ export function SettingsPage() {
         <div className="settings-row">
           <span className="settings-label">Тема</span>
           <div className="row period-switcher">
-            {(["calm", "sport", "minimal", "dark"] as const).map((t) => (
+            {(["fitness", "calm", "sport", "minimal", "dark"] as const).map((t) => (
               <Button
                 key={t}
                 className={theme === t ? "btn-segment is-active" : "btn-segment"}
@@ -28,7 +28,7 @@ export function SettingsPage() {
                   patchSettings.mutate({ theme: t });
                 }}
               >
-                {t === "calm" ? "🌊 Calm" : t === "sport" ? "⚡ Sport" : t === "minimal" ? "🪨 Minimal" : "🌑 Dark"}
+                {t === "fitness" ? "💪 Fitness" : t === "calm" ? "🌊 Calm" : t === "sport" ? "⚡ Sport" : t === "minimal" ? "🪨 Minimal" : "🌑 Dark"}
               </Button>
             ))}
           </div>

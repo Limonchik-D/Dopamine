@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-type ThemeName = "calm" | "sport" | "minimal" | "dark";
+type ThemeName = "fitness" | "calm" | "sport" | "minimal" | "dark";
 type LocaleName = "ru" | "en";
 
 type UiSettingsState = {
@@ -15,7 +15,7 @@ const THEME_KEY = "df_theme";
 const LOCALE_KEY = "df_locale";
 
 export const useUiSettings = create<UiSettingsState>((set) => ({
-  theme: (localStorage.getItem(THEME_KEY) as ThemeName) ?? "calm",
+  theme: (localStorage.getItem(THEME_KEY) as ThemeName) ?? "fitness",
   locale: (localStorage.getItem(LOCALE_KEY) as LocaleName) ?? "ru",
   setTheme: (theme) => {
     localStorage.setItem(THEME_KEY, theme);

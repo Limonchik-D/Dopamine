@@ -1,5 +1,14 @@
 import { PropsWithChildren } from "react";
 
-export function Card({ children }: PropsWithChildren) {
-  return <section className="card">{children}</section>;
+interface CardProps extends PropsWithChildren {
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+export function Card({ children, className, style }: CardProps) {
+  return (
+    <section className={`card${className ? ` ${className}` : ""}`} style={style}>
+      {children}
+    </section>
+  );
 }

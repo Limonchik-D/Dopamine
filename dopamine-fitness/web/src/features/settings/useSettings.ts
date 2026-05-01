@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../services/apiClient";
 
 export type Settings = {
-  theme: "calm" | "sport" | "minimal" | "dark";
+  theme: "fitness" | "calm" | "sport" | "minimal" | "dark";
   locale: "ru" | "en";
   units: "metric" | "imperial";
   notifications_enabled: boolean;
