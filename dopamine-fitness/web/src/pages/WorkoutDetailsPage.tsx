@@ -143,7 +143,7 @@ function ExerciseBlock({ we, workoutId }: { we: WorkoutExerciseEntry; workoutId:
       <div className="exercise-block-header">
         <div>
           <div className="exercise-block-title">
-            Упражнение #{we.exercise_id ?? we.custom_exercise_id ?? we.id}
+            {we.exercise_name ?? `Упражнение #${we.order_index + 1}`}
           </div>
           <div className="exercise-block-meta">
             {[we.target_muscle, we.equipment].filter(Boolean).join(" · ") || "Мышцы не указаны"}

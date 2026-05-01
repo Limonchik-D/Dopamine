@@ -432,15 +432,32 @@ input:focus, select:focus {
 .period-switcher {
   margin-top: var(--space-md);
   margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .btn-segment {
-  min-width: 96px;
+  min-width: 80px;
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  background: color-mix(in oklab, var(--surface) 60%, transparent);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  opacity: 0.75;
+  transition: opacity 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.btn-segment:hover {
+  opacity: 1;
+  color: var(--text);
+  border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
 }
 
 .btn-segment.is-active {
-  border-color: color-mix(in oklab, var(--accent) 78%, var(--border));
-  box-shadow: 0 0 18px color-mix(in oklab, var(--accent) 42%, transparent), 0 6px 20px rgba(2, 8, 24, 0.45);
+  opacity: 1;
+  color: var(--text);
+  border-color: color-mix(in oklab, var(--accent) 60%, var(--border));
+  box-shadow: 0 0 10px color-mix(in oklab, var(--accent) 20%, transparent);
 }
 
 .glass-chart-wrap {
@@ -998,3 +1015,58 @@ input:focus, select:focus {
 .home-feature-title { font-weight: 700; font-size: 0.95rem; margin: 0; }
 .home-feature-desc { font-size: 0.82rem; color: var(--muted); margin: 0; line-height: 1.5; }
 
+/* ??? Progress page exercise filter ??????????????????????????????????????????? */
+.progress-exercise-filter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-xs);
+}
+
+.progress-exercise-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.progress-exercise-dropdown {
+  list-style: none;
+  margin: 0 0 var(--space-sm);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.progress-exercise-option {
+  padding: 8px var(--space-sm);
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background 0.15s;
+}
+.progress-exercise-option:hover { background: color-mix(in oklab, var(--accent) 12%, var(--surface)); }
+.progress-exercise-option.is-selected { color: var(--accent); font-weight: 600; }
+
+.empty-chart {
+  text-align: center;
+  padding: var(--space-lg) 0;
+  color: var(--muted);
+}
+
+/* ??? Settings / ProgressPage spacing ????????????????????????????????????????? */
+.settings-section + .settings-section {
+  margin-top: var(--space-lg);
+}
+
+.glass-stat-card {
+  gap: 6px;
+}
+
+.glass-stat-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  padding-top: 2px;
+}

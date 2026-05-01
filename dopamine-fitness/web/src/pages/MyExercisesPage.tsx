@@ -24,87 +24,7 @@ const EQUIPMENT_OPTIONS = [
   "resistance band", "bodyweight", "pull-up bar", "bench", "other",
 ];
 
-// ─── Photo Upload Field ───────────────────────────────────────────────────────
-
-function PhotoUploadField({
-  currentUrl,
-  onUploaded,
-  customExerciseId,
-}: {
-  currentUrl?: string | null;
-  onUploaded: (url: string) => void;
-  customExerciseId?: number;
-}) {
-  const upload = useUploadExercisePhoto();
-  const [preview, setPreview] = useState<string | null>(currentUrl ?? null);
-  const [error, setError] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const onChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-      setError("Максимальный размер фото — 5 МБ");
-      return;
-    }
-    if (!file.type.startsWith("image/")) {
-      setError("Допустимы только изображения");
-      return;
-    }
-
-    setError("");
-    const localUrl = URL.createObjectURL(file);
-    setPreview(localUrl);
-
-    try {
-      const result = await upload.mutateAsync({ file, customExerciseId });
-      onUploaded(result.url);
-    } catch (err) {
-      setError(`${toUserMessage(err)}${toDiagnosticSuffix(err)}`);
-      setPreview(currentUrl ?? null);
-    }
-  };
-
-  return (
-    <div className="form-field">
-      <label>Фото упражнения</label>
-      <div className={`photo-upload-area${preview ? " has-file" : ""}`}>
-        <input
-          ref={inputRef}
-          className="photo-upload-input"
-          type="file"
-          accept="image/*"
-          onChange={onChange}
-        />
-        {preview ? (
-          <>
-            <img src={preview} alt="Превью" className="photo-preview" />
-            <p className="photo-upload-hint" style={{ marginTop: "var(--space-xs)" }}>
-              Нажми, чтобы заменить
-            </p>
-          </>
-        ) : (
-          <>
-            <div className="photo-upload-icon">📷</div>
-            <p className="photo-upload-hint">
-              <strong>Нажми</strong> или перетащи фото
-            </p>
-            <p className="photo-upload-hint">JPG, PNG, WebP · до 5 МБ</p>
-          </>
-        )}
-        {upload.isPending && (
-          <div className="upload-progress">
-            <div className="upload-progress-bar" style={{ width: "70%" }} />
-          </div>
-        )}
-      </div>
-      {error && <p className="error-text">{error}</p>}
-    </div>
-  );
-}
-
-// ─── Create Form ──────────────────────────────────────────────────────────────
+// ─── Create Form ────────────────────────────────────────────────────────────
 
 function CreateExerciseForm({ onCreated }: { onCreated: () => void }) {
   const create = useCreateCustomExercise();
@@ -135,7 +55,6 @@ function CreateExerciseForm({ onCreated }: { onCreated: () => void }) {
     e.preventDefault();
     if (!form.name.trim()) return;
     setError("");
-
     try {
       const exercise = await create.mutateAsync({
         name: form.name.trim(),
@@ -143,12 +62,9 @@ function CreateExerciseForm({ onCreated }: { onCreated: () => void }) {
         target: form.target?.trim() || undefined,
         equipment: form.equipment?.trim() || undefined,
       });
-
-      // Загружаем фото если выбрано
       if (photoFile) {
         await uploadPhoto.mutateAsync({ file: photoFile, customExerciseId: exercise.id });
       }
-
       setForm({ name: "", description: "", target: "", equipment: "" });
       setPhotoFile(null);
       setPhotoPreview(null);
@@ -207,12 +123,13 @@ function CreateExerciseForm({ onCreated }: { onCreated: () => void }) {
           <textarea
             value={form.description ?? ""}
             onChange={(e) => set("description", e.target.value)}
-            placeholder="Техника, особенности…"
+            placeholder="Техника выполнения..."
+            rows={2}
           />
         </div>
       </div>
 
-      {/* Photo Upload */}
+      {/* Фото */}
       <div className="form-field">
         <label>Фото упражнения</label>
         <div className={`photo-upload-area${photoPreview ? " has-file" : ""}`}>
@@ -233,7 +150,9 @@ function CreateExerciseForm({ onCreated }: { onCreated: () => void }) {
           ) : (
             <>
               <div className="photo-upload-icon">📷</div>
-              <p className="photo-upload-hint"><strong>Нажми</strong> или перетащи фото</p>
+              <p className="photo-upload-hint">
+                <strong>Нажми</strong> или перетащи фото
+              </p>
               <p className="photo-upload-hint">JPG, PNG, WebP · до 5 МБ</p>
             </>
           )}
@@ -257,15 +176,9 @@ function CreateExerciseForm({ onCreated }: { onCreated: () => void }) {
   );
 }
 
-// ─── Edit Form (inline) ───────────────────────────────────────────────────────
+// ─── Edit Form (inline) ──────────────────────────────────────────────────────
 
-function EditExerciseForm({
-  ex,
-  onDone,
-}: {
-  ex: CustomExercise;
-  onDone: () => void;
-}) {
+function EditExerciseForm({ ex, onDone }: { ex: CustomExercise; onDone: () => void }) {
   const update = useUpdateCustomExercise();
   const uploadPhoto = useUploadExercisePhoto();
   const [name, setName] = useState(ex.name);
@@ -339,30 +252,29 @@ function EditExerciseForm({
         </div>
         <div className="form-field">
           <label>Описание</label>
-          <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={2}
+          />
         </div>
       </div>
 
-      {/* Photo */}
+      {/* Замена фото */}
       <div className="form-field">
-        <label>Заменить фото</label>
-        <div className={`photo-upload-area${photoFile ? " has-file" : ""}`}>
-          <input ref={inputRef} className="photo-upload-input" type="file" accept="image/*" onChange={onPhotoChange} />
+        <label>Фото (замена)</label>
+        <div className={`photo-upload-area${photoPreview ? " has-file" : ""}`} style={{ minHeight: 80 }}>
+          <input
+            ref={inputRef}
+            className="photo-upload-input"
+            type="file"
+            accept="image/*"
+            onChange={onPhotoChange}
+          />
           {photoPreview ? (
-            <>
-              <img src={photoPreview} alt="Превью" className="photo-preview" />
-              <p className="photo-upload-hint" style={{ marginTop: "var(--space-xs)" }}>Нажми, чтобы заменить</p>
-            </>
+            <img src={photoPreview} alt="Превью" className="photo-preview" style={{ maxHeight: 100 }} />
           ) : (
-            <>
-              <div className="photo-upload-icon">📷</div>
-              <p className="photo-upload-hint">Нажми для замены</p>
-            </>
-          )}
-          {uploadPhoto.isPending && (
-            <div className="upload-progress">
-              <div className="upload-progress-bar" style={{ width: "70%" }} />
-            </div>
+            <p className="photo-upload-hint">Нажми для загрузки нового фото</p>
           )}
         </div>
         {photoError && <p className="error-text">{photoError}</p>}
@@ -370,11 +282,11 @@ function EditExerciseForm({
 
       {error && <p className="error-text">{error}</p>}
 
-      <div className="row">
+      <div className="row" style={{ gap: "var(--space-sm)" }}>
         <Button type="submit" disabled={isPending}>
           {isPending ? "Сохранение…" : "Сохранить"}
         </Button>
-        <Button type="button" className="btn-ghost" onClick={onDone} disabled={isPending}>
+        <Button type="button" className="btn-ghost" onClick={onDone}>
           Отмена
         </Button>
       </div>
@@ -382,7 +294,7 @@ function EditExerciseForm({
   );
 }
 
-// ─── Exercise Card ────────────────────────────────────────────────────────────
+// ─── Card ────────────────────────────────────────────────────────────────────
 
 function MyExerciseCard({ ex }: { ex: CustomExercise }) {
   const deleteEx = useDeleteCustomExercise();
@@ -440,7 +352,7 @@ function MyExerciseCard({ ex }: { ex: CustomExercise }) {
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// ─── Page ────────────────────────────────────────────────────────────────────
 
 export function MyExercisesPage() {
   const { data, isLoading } = useCustomExercises();
@@ -450,7 +362,6 @@ export function MyExercisesPage() {
 
   return (
     <div className="stack">
-      {/* Header */}
       <Card>
         <div className="workout-header">
           <div>
@@ -463,7 +374,6 @@ export function MyExercisesPage() {
         </div>
       </Card>
 
-      {/* Форма создания */}
       {showCreate && (
         <Card>
           <h3 style={{ margin: "0 0 var(--space-md)" }}>Новое упражнение</h3>
@@ -471,11 +381,8 @@ export function MyExercisesPage() {
         </Card>
       )}
 
-      {/* Список */}
       {isLoading ? (
-        <Card>
-          <p style={{ color: "var(--muted)" }}>Загрузка…</p>
-        </Card>
+        <Card><p style={{ color: "var(--muted)" }}>Загрузка…</p></Card>
       ) : exercises.length === 0 ? (
         <Card>
           <div className="empty-state">
@@ -501,4 +408,3 @@ export function MyExercisesPage() {
     </div>
   );
 }
-

@@ -28,6 +28,7 @@ export type WorkoutExerciseEntry = {
   order_index: number;
   target_muscle: string | null;
   equipment: string | null;
+  exercise_name?: string | null;
   sets: WorkoutSet[];
 };
 

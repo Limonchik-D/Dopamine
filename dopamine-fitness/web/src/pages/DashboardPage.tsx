@@ -82,14 +82,6 @@ export function DashboardPage() {
           <span className="glass-stat-value">{summary?.total_workouts ?? "—"}</span>
           <span className="glass-stat-label">Тренировок</span>
         </div>
-        <div className="glass-stat-card">
-          <span className="glass-stat-value">{summary ? Math.round(summary.total_volume / 1000) + "т" : "—"}</span>
-          <span className="glass-stat-label">Объём</span>
-        </div>
-        <div className="glass-stat-card">
-          <span className="glass-stat-value">{summary?.max_weight ?? "—"}</span>
-          <span className="glass-stat-label">Рекорд, кг</span>
-        </div>
       </div>
 
       {/* Last workout */}
