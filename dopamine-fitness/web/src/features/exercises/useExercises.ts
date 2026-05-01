@@ -101,3 +101,28 @@ export function useToggleFavorite() {
   return { add, remove };
 }
 
+// ─── Enriched exercise type (returned by POST /exercises/:id/enrich) ──────────
+
+export interface EnrichedExercise extends Exercise {
+  difficulty: string | null;
+  secondary_muscles: string[] | null;
+  enriched_from: string[];
+}
+
+// ─── On-demand enrichment hook ────────────────────────────────────────────────
+// Calls POST /exercises/:id/enrich — cached server-side 7 days.
+// Returns a trigger function + loading/data state. Does NOT auto-run.
+
+export function useEnrichExercise(exerciseId: number | undefined) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () =>
+      apiClient.post<EnrichedExercise>(`/exercises/${exerciseId}/enrich`),
+    onSuccess: (data) => {
+      // Merge enriched data into the base exercise query cache
+      queryClient.setQueryData(["exercise", String(exerciseId)], data);
+    },
+  });
+}
+
+

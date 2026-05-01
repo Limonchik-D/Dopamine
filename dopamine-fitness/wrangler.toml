@@ -46,6 +46,7 @@ ADMIN_EMAILS = "limonmilion2007@gmail.com"
 # ─── Secrets (set via: wrangler secret put SECRET_NAME) ─────────────────────
 # JWT_SECRET
 # EXERCISEDB_API_KEY
+# NINJAS_API_KEY         ← API-Ninjas (optional, for difficulty + instructions)
 # GOOGLE_CLIENT_SECRET
 # BCRYPT_ROUNDS (optional, default 12)
 

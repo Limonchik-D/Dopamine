@@ -6,6 +6,8 @@ import {
   useExercise,
   useFavorites,
   useToggleFavorite,
+  useEnrichExercise,
+  type EnrichedExercise,
 } from "../features/exercises/useExercises";
 import { useWorkouts, useAddExerciseToWorkout } from "../features/workouts/useWorkouts";
 
@@ -61,9 +63,14 @@ function AddToWorkoutPanel({ exerciseId }: { exerciseId: number }) {
 
 export function ExerciseDetailsPage() {
   const { id } = useParams();
-  const { data: ex, isLoading, error } = useExercise(id);
+  const { data: baseEx, isLoading, error } = useExercise(id);
   const { data: favorites } = useFavorites();
   const { add: favAdd, remove: favRemove } = useToggleFavorite();
+  const enrich = useEnrichExercise(baseEx?.id);
+
+  // enriched data overlays base data when available
+  const ex = (enrich.data as EnrichedExercise | undefined) ?? baseEx;
+  const enriched = enrich.data as EnrichedExercise | undefined;
 
   const isFav = Boolean(favorites?.some((f) => f.exercise_id === ex?.id));
 
@@ -77,6 +84,12 @@ export function ExerciseDetailsPage() {
   const instructionList: string[] = instructions
     ? instructions.split(/\.\s+/).map((s) => s.trim()).filter(Boolean)
     : [];
+
+  const DIFFICULTY_COLORS: Record<string, string> = {
+    beginner: "#4ade80",
+    intermediate: "#facc15",
+    expert: "#f87171",
+  };
 
   if (isLoading) {
     return (
@@ -115,26 +128,41 @@ export function ExerciseDetailsPage() {
         </div>
 
         <div className="exercise-details-layout">
-          {/* GIF / изображение */}
-          <div>
+          {/* GIF / image */}
+          <div className="exercise-details-media-col">
             {ex.gif_url ? (
-              <img
-                src={ex.gif_url}
-                alt={ex.name_en}
-                className="exercise-details-gif"
-              />
+              <img src={ex.gif_url} alt={ex.name_en} className="exercise-details-gif" />
             ) : ex.image_url ? (
-              <img
-                src={ex.image_url}
-                alt={ex.name_en}
-                className="exercise-details-gif"
-              />
+              <img src={ex.image_url} alt={ex.name_en} className="exercise-details-gif" />
             ) : (
               <div className="exercise-details-gif-placeholder">🏋️</div>
             )}
+
+            {/* GIF enrichment button — shown only when no GIF yet */}
+            {!ex.gif_url && (
+              <Button
+                className="enrich-gif-btn"
+                onClick={() => enrich.mutate()}
+                disabled={enrich.isPending}
+                style={{ marginTop: "var(--space-sm)", width: "100%" }}
+              >
+                {enrich.isPending
+                  ? "⏳ Загружаем GIF…"
+                  : enrich.isError
+                  ? "❌ Не удалось — повторить"
+                  : "▶ Загрузить GIF"}
+              </Button>
+            )}
+
+            {/* Enrichment source badge */}
+            {enriched?.enriched_from && enriched.enriched_from.length > 0 && (
+              <div className="enrich-source-badge">
+                Обогащено: {enriched.enriched_from.join(", ")}
+              </div>
+            )}
           </div>
 
-          {/* Информация */}
+          {/* Info */}
           <div>
             <h2 style={{ margin: "0 0 var(--space-xs)" }}>
               {ex.name_ru ?? ex.name_en}
@@ -146,14 +174,20 @@ export function ExerciseDetailsPage() {
             )}
 
             <div className="exercise-tags-row">
-              {ex.target && (
-                <span className="exercise-tag">{ex.target}</span>
-              )}
-              {ex.body_part && (
-                <span className="exercise-tag">{ex.body_part}</span>
-              )}
-              {ex.equipment && (
-                <span className="exercise-tag tag-secondary">{ex.equipment}</span>
+              {ex.target && <span className="exercise-tag">{ex.target}</span>}
+              {ex.body_part && <span className="exercise-tag">{ex.body_part}</span>}
+              {ex.equipment && <span className="exercise-tag tag-secondary">{ex.equipment}</span>}
+              {enriched?.difficulty && (
+                <span
+                  className="exercise-tag"
+                  style={{
+                    background: `${DIFFICULTY_COLORS[enriched.difficulty] ?? "var(--accent)"}22`,
+                    color: DIFFICULTY_COLORS[enriched.difficulty] ?? "var(--accent)",
+                    borderColor: DIFFICULTY_COLORS[enriched.difficulty] ?? "var(--accent)",
+                  }}
+                >
+                  {enriched.difficulty}
+                </span>
               )}
               {ex.source && (
                 <span className="exercise-tag tag-secondary" style={{ opacity: 0.7 }}>
@@ -161,6 +195,16 @@ export function ExerciseDetailsPage() {
                 </span>
               )}
             </div>
+
+            {/* Secondary muscles */}
+            {enriched?.secondary_muscles && enriched.secondary_muscles.length > 0 && (
+              <div className="exercise-secondary-muscles">
+                <span className="exercise-secondary-label">Вторичные мышцы:</span>
+                {enriched.secondary_muscles.map((m) => (
+                  <span key={m} className="exercise-tag tag-secondary" style={{ fontSize: "0.78rem" }}>{m}</span>
+                ))}
+              </div>
+            )}
 
             {instructionList.length > 0 && (
               <div className="exercise-instructions">
@@ -171,6 +215,17 @@ export function ExerciseDetailsPage() {
                   ))}
                 </ol>
               </div>
+            )}
+
+            {/* Enrich button inside info col when no instructions yet */}
+            {!instructions && !enrich.isPending && !enrich.data && (
+              <Button
+                className="enrich-gif-btn"
+                onClick={() => enrich.mutate()}
+                style={{ marginTop: "var(--space-md)" }}
+              >
+                ✨ Загрузить инструкции и сложность
+              </Button>
             )}
 
             <AddToWorkoutPanel exerciseId={ex.id} />

@@ -22,6 +22,7 @@ export interface Env {
   EXERCISEDB_BASE_URL: string;
   EXERCISEDB_API_KEY: string;
   WGER_BASE_URL: string;
+  NINJAS_API_KEY?: string;   // API-Ninjas exercises — optional enrichment source
   APP_NAME: string;
   APP_ALLOWED_ORIGINS: string;
   ADMIN_EMAILS?: string;

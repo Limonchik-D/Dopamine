@@ -37,6 +37,20 @@ export class ExerciseDBIntegration {
     return response.json<ExerciseDBItem>();
   }
 
+  async fetchByName(name: string): Promise<ExerciseDBItem[]> {
+    const response = await fetch(
+      `${this.baseUrl}/exercises/name/${encodeURIComponent(name.toLowerCase())}?limit=10`,
+      {
+        headers: {
+          "X-RapidAPI-Key": this.apiKey,
+          "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
+        },
+      }
+    );
+    if (!response.ok) throw new Error(`ExerciseDB API error: ${response.status}`);
+    return response.json<ExerciseDBItem[]>();
+  }
+
   async fetchByTarget(target: string): Promise<ExerciseDBItem[]> {
     const response = await fetch(
       `${this.baseUrl}/exercises/target/${encodeURIComponent(target)}?limit=50`,

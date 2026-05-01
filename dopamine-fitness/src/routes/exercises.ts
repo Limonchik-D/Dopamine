@@ -3,6 +3,7 @@ import type { Env, HonoVariables } from "../types/index.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { requireRole } from "../middlewares/requireRole.js";
 import { ExerciseService } from "../services/exerciseService.js";
+import { ExerciseEnrichmentService } from "../services/exerciseEnrichmentService.js";
 import { validate } from "../validators/validate.js";
 import { exerciseFilterSchema } from "../validators/schemas.js";
 
@@ -40,4 +41,20 @@ exerciseRoutes.get("/:id", async (c) => {
   const service = new ExerciseService(c.env);
   const exercise = await service.getById(id);
   return c.json({ success: true, data: exercise });
+});
+
+// POST /exercises/:id/enrich — on-demand enrichment (GIF + difficulty + instructions)
+// Called when user clicks "GIF" or opens exercise detail.
+// Results are cached in KV (7 days) and persisted to D1, so subsequent calls are free.
+exerciseRoutes.post("/:id/enrich", async (c) => {
+  const id = parseInt(c.req.param("id"), 10);
+  if (!Number.isFinite(id)) return c.json({ success: false, error: "Invalid id" }, 400);
+  try {
+    const service = new ExerciseEnrichmentService(c.env);
+    const result = await service.enrich(id);
+    return c.json({ success: true, data: result });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Enrichment failed";
+    return c.json({ success: false, error: msg }, 500);
+  }
 });
