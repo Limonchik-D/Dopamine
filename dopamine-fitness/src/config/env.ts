@@ -13,12 +13,41 @@ export interface AppConfig {
     exerciseDbApiKey: string;
     wgerBaseUrl: string;
   };
+  cache: {
+    statsTtlSeconds: number;
+    checkinsTtlSeconds: number;
+  };
   uploads: {
     maxSizeMb: number;
   };
   cors: {
     allowedOrigins: string[];
   };
+  auth: {
+    adminEmails: string[];
+    google?: {
+      clientId: string;
+      clientSecret: string;
+      redirectUri: string;
+    };
+  };
+}
+
+function parseOptionalPositiveInt(value: string | undefined, fallback: number): number {
+  const normalized = value?.trim();
+  if (!normalized) return fallback;
+  const parsed = Number.parseInt(normalized, 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
+  return parsed;
+}
+
+function resetIfOriginMismatch(env: Env) {
+  const expectedFingerprint = `${env.ENVIRONMENT}|${env.APP_NAME}|${env.APP_ALLOWED_ORIGINS}|${env.GOOGLE_CLIENT_ID ?? ""}|${env.GOOGLE_REDIRECT_URI ?? ""}|${env.ADMIN_EMAILS ?? ""}`;
+  const marker = (globalThis as unknown as { __df_cfg_marker?: string }).__df_cfg_marker;
+  if (marker && marker !== expectedFingerprint) {
+    cachedConfig = null;
+  }
+  (globalThis as unknown as { __df_cfg_marker?: string }).__df_cfg_marker = expectedFingerprint;
 }
 
 let cachedConfig: AppConfig | null = null;
@@ -49,6 +78,7 @@ function requirePositiveInt(name: keyof Env, value: string | undefined): number 
 }
 
 export function getAppConfig(env: Env): AppConfig {
+  resetIfOriginMismatch(env);
   if (cachedConfig) return cachedConfig;
 
   cachedConfig = {
@@ -64,11 +94,25 @@ export function getAppConfig(env: Env): AppConfig {
       exerciseDbApiKey: requireString("EXERCISEDB_API_KEY", env.EXERCISEDB_API_KEY),
       wgerBaseUrl: requireString("WGER_BASE_URL", env.WGER_BASE_URL),
     },
+    cache: {
+      statsTtlSeconds: parseOptionalPositiveInt(env.STATS_CACHE_TTL, 120),
+      checkinsTtlSeconds: parseOptionalPositiveInt(env.CHECKINS_CACHE_TTL, 60),
+    },
     uploads: {
       maxSizeMb: requirePositiveInt("MAX_UPLOAD_SIZE_MB", env.MAX_UPLOAD_SIZE_MB),
     },
     cors: {
       allowedOrigins: parseCsv(env.APP_ALLOWED_ORIGINS),
+    },
+    auth: {
+      adminEmails: parseCsv(env.ADMIN_EMAILS).map((email) => email.toLowerCase()),
+      google: env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET && env.GOOGLE_REDIRECT_URI
+        ? {
+            clientId: requireString("GOOGLE_CLIENT_ID", env.GOOGLE_CLIENT_ID),
+            clientSecret: requireString("GOOGLE_CLIENT_SECRET", env.GOOGLE_CLIENT_SECRET),
+            redirectUri: requireString("GOOGLE_REDIRECT_URI", env.GOOGLE_REDIRECT_URI),
+          }
+        : undefined,
     },
   };
 

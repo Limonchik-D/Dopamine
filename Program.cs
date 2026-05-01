@@ -25,5 +25,11 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+app.MapGet("/", () =>
+    Results.Redirect(
+        app.Environment.IsDevelopment()
+            ? "http://localhost:5173"
+            : "https://dopamine.limonmilion2007.workers.dev"));
+
 
 app.Run();

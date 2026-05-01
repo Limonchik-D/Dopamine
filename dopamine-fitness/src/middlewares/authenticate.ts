@@ -30,6 +30,7 @@ export function authenticate() {
 
     c.set("userId", payload.sub);
     c.set("userEmail", payload.email);
+    c.set("userRole", payload.role ?? "user");
     await next();
     return;
   });

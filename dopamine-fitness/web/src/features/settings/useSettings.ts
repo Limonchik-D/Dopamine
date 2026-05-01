@@ -8,10 +8,11 @@ export type Settings = {
   notifications_enabled: boolean;
 };
 
-export function useSettings() {
+export function useSettings(enabled = true) {
   return useQuery({
     queryKey: ["settings"],
     queryFn: () => apiClient.get<Settings>("/settings"),
+    enabled,
   });
 }
 

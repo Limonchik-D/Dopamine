@@ -97,3 +97,143 @@ input, select {
   .container { padding: var(--space-sm); }
   .btn { width: 100%; }
 }
+
+.daily-checkin-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.daily-checkin-header h3 {
+  margin: 0;
+}
+
+.daily-checkin-subtitle {
+  margin: var(--space-xs) 0 0;
+  color: var(--muted);
+}
+
+.daily-stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.daily-stat-tile {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  background: var(--bg);
+}
+
+.daily-stat-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--font-sm);
+}
+
+.daily-stat-value {
+  margin: 8px 0 0;
+  font-size: var(--font-lg);
+  font-weight: 700;
+}
+
+.daily-motivation {
+  margin: var(--space-md) 0;
+  font-weight: 600;
+}
+
+.checkin-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-xs);
+}
+
+.calendar-grid-large {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-xs);
+}
+
+.calendar-legend-row {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  margin: 0 0 var(--space-md);
+}
+
+.calendar-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--muted);
+  font-size: var(--font-sm);
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.legend-dot-active {
+  background: color-mix(in oklab, var(--accent) 16%, var(--surface));
+  border-color: color-mix(in oklab, var(--accent) 55%, var(--border));
+}
+
+.legend-dot-today {
+  outline: 2px dashed color-mix(in oklab, var(--accent) 55%, transparent);
+  outline-offset: 1px;
+}
+
+.checkin-day {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  font-size: var(--font-sm);
+  color: var(--muted);
+  background: var(--surface);
+}
+
+.checkin-day.is-active {
+  background: color-mix(in oklab, var(--accent) 16%, var(--surface));
+  border-color: color-mix(in oklab, var(--accent) 55%, var(--border));
+  color: var(--text);
+  font-weight: 600;
+}
+
+.checkin-day.is-today {
+  outline: 2px dashed color-mix(in oklab, var(--accent) 55%, transparent);
+  outline-offset: 1px;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-sm);
+}
+
+.admin-table th,
+.admin-table td {
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  padding: 10px;
+  vertical-align: top;
+}
+
+.admin-table th {
+  color: var(--muted);
+  font-weight: 600;
+}

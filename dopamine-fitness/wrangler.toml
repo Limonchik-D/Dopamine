@@ -36,10 +36,16 @@ EXERCISEDB_BASE_URL = "https://exercisedb.p.rapidapi.com"
 WGER_BASE_URL = "https://wger.de/api/v2"
 APP_NAME = "Dopamine Fitness"
 APP_ALLOWED_ORIGINS = "https://dopamine.limonmilion2007.workers.dev"
+STATS_CACHE_TTL = "120"
+CHECKINS_CACHE_TTL = "60"
+GOOGLE_CLIENT_ID = "69754675826-uuilvialdp4ma491ufmfqu8vapl22pnv.apps.googleusercontent.com"
+GOOGLE_REDIRECT_URI = "https://dopamine.limonmilion2007.workers.dev/api/auth/google/callback"
+ADMIN_EMAILS = "limonmilion2007@gmail.com"
 
 # ─── Secrets (set via: wrangler secret put SECRET_NAME) ─────────────────────
 # JWT_SECRET
 # EXERCISEDB_API_KEY
+# GOOGLE_CLIENT_SECRET
 # BCRYPT_ROUNDS (optional, default 12)
 
 # ─── Local Development ──────────────────────────────────────────────────────

@@ -14,7 +14,8 @@ profileRoutes.get("/me", async (c) => {
   const service = new AuthService(
     c.env.DB,
     config.jwt.secret,
-    config.jwt.expiresInSeconds
+    config.jwt.expiresInSeconds,
+    config.auth.adminEmails
   );
   const user = await service.getMe(userId);
 

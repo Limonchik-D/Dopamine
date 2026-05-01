@@ -12,6 +12,8 @@ import { statsRoutes } from "./routes/stats.js";
 import { settingsRoutes } from "./routes/settings.js";
 import { profileRoutes } from "./routes/profile.js";
 import { favoritesRoutes } from "./routes/favorites.js";
+import { checkinRoutes } from "./routes/checkins.js";
+import { adminRoutes } from "./routes/admin.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { requestId } from "./middlewares/requestId.js";
 import { rateLimiter } from "./middlewares/rateLimiter.js";
@@ -66,6 +68,8 @@ app.route("/api/uploads", uploadRoutes);
 app.route("/api/stats", statsRoutes);
 app.route("/api/settings", settingsRoutes);
 app.route("/api/favorites", favoritesRoutes);
+app.route("/api/checkins", checkinRoutes);
+app.route("/api/admin", adminRoutes);
 
 // ─── Error Handler ────────────────────────────────────────────────────────────
 

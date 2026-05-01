@@ -61,6 +61,10 @@ export const settingsSchema = z.object({
   notifications_enabled: z.boolean().optional(),
 });
 
+export const checkinSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Формат: YYYY-MM-DD").optional(),
+});
+
 export const exerciseFilterSchema = z.object({
   search: z.string().max(100).optional(),
   target: z.string().max(64).optional(),
@@ -79,4 +83,5 @@ export type WorkoutExerciseInput = z.output<typeof workoutExerciseSchema>;
 export type SetInput = z.output<typeof setSchema>;
 export type CustomExerciseInput = z.infer<typeof customExerciseSchema>;
 export type SettingsInput = z.infer<typeof settingsSchema>;
+export type CheckinInput = z.infer<typeof checkinSchema>;
 export type ExerciseFilterInput = z.output<typeof exerciseFilterSchema>;

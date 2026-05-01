@@ -2,10 +2,12 @@ import { NavLink, Outlet } from "react-router-dom";
 import { useEffect } from "react";
 import { useUiSettings } from "../../features/settings/useUiSettings";
 import { useT } from "../../i18n";
+import { useMe } from "../../features/auth/useAuth";
 
 export function AppLayout() {
   const theme = useUiSettings((s) => s.theme);
   const t = useT();
+  const { data: me } = useMe();
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -21,6 +23,8 @@ export function AppLayout() {
           <NavLink to="/workouts">{t("nav.workouts")}</NavLink>
           <NavLink to="/exercises">{t("nav.exercises")}</NavLink>
           <NavLink to="/progress">{t("nav.progress")}</NavLink>
+          <NavLink to="/calendar">Календарь</NavLink>
+          {me?.role === "admin" && <NavLink to="/admin">Админ</NavLink>}
           <NavLink to="/settings">{t("nav.settings")}</NavLink>
           <NavLink to="/profile">{t("nav.profile")}</NavLink>
         </nav>

@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import type { Env, HonoVariables } from "../types/index.js";
 import { authenticate } from "../middlewares/authenticate.js";
+import { requireRole } from "../middlewares/requireRole.js";
 import { ExerciseService } from "../services/exerciseService.js";
 import { validate } from "../validators/validate.js";
 import { exerciseFilterSchema } from "../validators/schemas.js";
@@ -27,7 +28,7 @@ exerciseRoutes.get("/filters", async (c) => {
 });
 
 // GET /exercises/sync — admin: trigger sync from ExerciseDB/wger
-exerciseRoutes.post("/sync", async (c) => {
+exerciseRoutes.post("/sync", requireRole("admin"), async (c) => {
   const service = new ExerciseService(c.env);
   const result = await service.syncFromExternalAPIs();
   return c.json({ success: true, data: result });

@@ -21,6 +21,12 @@ export interface Env {
   WGER_BASE_URL: string;
   APP_NAME: string;
   APP_ALLOWED_ORIGINS: string;
+  ADMIN_EMAILS?: string;
+  STATS_CACHE_TTL?: string;
+  CHECKINS_CACHE_TTL?: string;
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_REDIRECT_URI?: string;
+  GOOGLE_CLIENT_SECRET?: string;
 }
 
 // ─── Hono Context Variables ───────────────────────────────────────────────────
@@ -28,6 +34,7 @@ export interface Env {
 export interface HonoVariables {
   userId: number;
   userEmail: string;
+  userRole: UserRole;
   requestId: string;
 }
 
@@ -44,6 +51,7 @@ export interface AppContext {
 export interface JwtPayload {
   sub: number;       // user id
   email: string;
+  role?: UserRole;
   iat: number;
   exp: number;
 }
@@ -87,9 +95,13 @@ export interface User {
   id: number;
   email: string;
   username: string;
+  role: UserRole;
+  google_sub?: string | null;
   created_at: string;
   updated_at: string;
 }
+
+export type UserRole = "user" | "admin";
 
 export interface UserProfile {
   user_id: number;
@@ -188,6 +200,13 @@ export interface ProgressSnapshot {
   reps: number | null;
   volume: number | null;
   one_rm_estimate: number | null;
+}
+
+export interface DailyCheckin {
+  id: number;
+  user_id: number;
+  checkin_date: string;
+  created_at: string;
 }
 
 export interface StatsPoint {
