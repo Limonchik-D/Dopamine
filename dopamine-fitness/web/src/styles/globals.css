@@ -1211,3 +1211,275 @@ input::placeholder, textarea::placeholder { color: var(--muted); }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.18); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   WORKOUT BUILDER
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Create plan entry button (WorkoutsPage) */
+.builder-create-plan-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--accent) 40%, transparent);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.builder-create-plan-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px color-mix(in srgb, var(--accent) 50%, transparent); }
+.builder-create-plan-btn:active { transform: scale(0.97); }
+.builder-create-plan-icon {
+  width: 28px; height: 28px;
+  background: rgba(0,0,0,0.18);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; font-weight: 900; flex-shrink: 0;
+}
+
+/* Back button in builder header */
+.builder-back-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: var(--font-sm);
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color 0.15s;
+}
+.builder-back-btn:hover { color: var(--text); }
+
+/* Form fields */
+.builder-field-group { display: flex; flex-direction: column; gap: 6px; }
+.builder-label { font-size: var(--font-sm); font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* Exercise card in builder */
+.builder-exercise-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.builder-exercise-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.builder-exercise-name {
+  font-weight: 700;
+  font-size: 1rem;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.builder-exercise-remove {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+.builder-exercise-remove:hover { color: #ff4d4d; background: rgba(255,77,77,0.12); }
+
+/* Sets list */
+.builder-sets-list { display: flex; flex-direction: column; gap: 6px; }
+.builder-sets-header {
+  display: grid;
+  grid-template-columns: 60px 1fr 1fr 28px;
+  gap: 8px;
+  font-size: var(--font-sm);
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0 4px;
+}
+
+/* Set row */
+.builder-set-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 1fr 28px;
+  gap: 8px;
+  align-items: center;
+}
+.builder-set-num {
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.builder-set-delete {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 2px;
+  border-radius: 5px;
+  transition: color 0.15s;
+}
+.builder-set-delete:hover { color: #ff4d4d; }
+
+/* .set-input already defined globally; make focus lime */
+.set-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent); }
+
+/* Add Exercise button (inside builder) */
+.builder-add-exercise-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 20px;
+  background: var(--surface);
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius-lg);
+  color: var(--accent);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.builder-add-exercise-btn:hover { background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+.builder-add-exercise-btn:active { transform: scale(0.98); }
+.builder-add-icon { font-size: 1.4rem; line-height: 1; }
+
+/* Save button */
+.builder-save-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+/* Outline accent button (add set) */
+.btn-accent-outline {
+  background: transparent;
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+.btn-accent-outline:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+
+/* Exercise Picker overlay */
+.builder-picker-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 0.15s ease;
+}
+@media (min-width: 640px) {
+  .builder-picker-overlay { align-items: center; }
+}
+.builder-picker {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  width: 100%;
+  max-width: 520px;
+  max-height: 75vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  animation: slideUp 0.2s ease;
+}
+@media (min-width: 640px) {
+  .builder-picker { border-radius: var(--radius-xl); max-height: 70vh; }
+}
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.builder-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+.builder-picker-title { font-weight: 700; font-size: 1rem; }
+.builder-picker-close {
+  background: none; border: none; color: var(--muted);
+  font-size: 1.2rem; cursor: pointer; padding: 4px 8px; border-radius: 8px;
+}
+.builder-picker-close:hover { color: var(--text); background: var(--surface); }
+.builder-picker-list {
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+.builder-picker-section-label {
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 8px 4px 4px;
+}
+.builder-picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.12s;
+  gap: 8px;
+}
+.builder-picker-item:hover { background: var(--surface); }
+.builder-picker-item-name { font-weight: 600; }
+
+/* Success screen */
+.builder-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  min-height: 60vh;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+.builder-success-icon {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #000;
+  font-size: 2.2rem;
+  font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 40px color-mix(in srgb, var(--accent) 50%, transparent);
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.builder-success-title { font-size: 1.6rem; font-weight: 800; }
+@keyframes popIn {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+

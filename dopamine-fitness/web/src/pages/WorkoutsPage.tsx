@@ -1,11 +1,12 @@
 import { FormEvent, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCreateWorkout, useWorkouts } from "../features/workouts/useWorkouts";
 import { Card } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { toDiagnosticSuffix, toUserMessage } from "../services/apiErrors";
 
 export function WorkoutsPage() {
+  const navigate = useNavigate();
   const { data, isLoading } = useWorkouts();
   const createWorkout = useCreateWorkout();
   const [name, setName] = useState("");
@@ -35,6 +36,12 @@ export function WorkoutsPage() {
 
   return (
     <div className="stack">
+      {/* Floating create plan button */}
+      <button className="builder-create-plan-btn" onClick={() => navigate("/workouts/new")}>
+        <span className="builder-create-plan-icon">+</span>
+        Create Workout Plan
+      </button>
+
       <Card>
         <h2>Мои тренировки</h2>
         <form onSubmit={onSubmit} className="stack" style={{ marginTop: "var(--space-md)" }}>

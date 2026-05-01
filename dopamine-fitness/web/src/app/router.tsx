@@ -7,6 +7,7 @@ const AuthPage = lazy(() => import("../pages/AuthPage").then((m) => ({ default: 
 const DashboardPage = lazy(() => import("../pages/DashboardPage").then((m) => ({ default: m.DashboardPage })));
 const WorkoutsPage = lazy(() => import("../pages/WorkoutsPage").then((m) => ({ default: m.WorkoutsPage })));
 const WorkoutDetailsPage = lazy(() => import("../pages/WorkoutDetailsPage").then((m) => ({ default: m.WorkoutDetailsPage })));
+const WorkoutBuilderPage = lazy(() => import("../pages/WorkoutBuilderPage").then((m) => ({ default: m.WorkoutBuilderPage })));
 const ExerciseCatalogPage = lazy(() => import("../pages/ExerciseCatalogPage").then((m) => ({ default: m.ExerciseCatalogPage })));
 const ExerciseDetailsPage = lazy(() => import("../pages/ExerciseDetailsPage").then((m) => ({ default: m.ExerciseDetailsPage })));
 const MyExercisesPage = lazy(() => import("../pages/MyExercisesPage").then((m) => ({ default: m.MyExercisesPage })));
@@ -25,6 +26,7 @@ export function AppRouter() {
           <Route path="auth" element={<AuthPage />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="workouts" element={<WorkoutsPage />} />
+          <Route path="workouts/new" element={<WorkoutBuilderPage />} />
           <Route path="workouts/:id" element={<WorkoutDetailsPage />} />
           <Route path="exercises" element={<ExerciseCatalogPage />} />
           <Route path="exercises/:id" element={<ExerciseDetailsPage />} />
