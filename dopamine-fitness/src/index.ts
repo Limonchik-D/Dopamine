@@ -57,6 +57,44 @@ app.get("/health", (c) =>
   }
 );
 
+app.get("/health/dependencies", async (c) => {
+  const config = getAppConfig(c.env);
+
+  let dbOk = false;
+  let kvOk = false;
+
+  try {
+    const row = await c.env.DB.prepare("SELECT 1 AS ok").first<{ ok: number }>();
+    dbOk = row?.ok === 1;
+  } catch {
+    dbOk = false;
+  }
+
+  try {
+    await c.env.KV.get("health:ping");
+    kvOk = true;
+  } catch {
+    kvOk = false;
+  }
+
+  const ready = dbOk && kvOk;
+
+  return c.json(
+    {
+      status: ready ? "ok" : "degraded",
+      ready,
+      app: config.appName,
+      env: config.environment,
+      dependencies: {
+        db: dbOk,
+        kv: kvOk,
+      },
+      ts: new Date().toISOString(),
+    },
+    ready ? 200 : 503
+  );
+});
+
 // ─── API Routes ───────────────────────────────────────────────────────────────
 
 app.route("/api/auth", authRoutes);
@@ -70,6 +108,13 @@ app.route("/api/settings", settingsRoutes);
 app.route("/api/favorites", favoritesRoutes);
 app.route("/api/checkins", checkinRoutes);
 app.route("/api/admin", adminRoutes);
+
+app.get("*", async (c) => {
+  if (!c.env.ASSETS) {
+    return c.json({ success: false, error: "Not found" }, 404);
+  }
+  return c.env.ASSETS.fetch(c.req.raw);
+});
 
 // ─── Error Handler ────────────────────────────────────────────────────────────
 

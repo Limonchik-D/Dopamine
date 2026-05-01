@@ -1,6 +1,9 @@
 // ─── Cloudflare Bindings ─────────────────────────────────────────────────────
 
 export interface Env {
+  // Static assets binding
+  ASSETS?: Fetcher;
+
   // D1 — structured relational data
   DB: D1Database;
 

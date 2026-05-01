@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Card } from "../components/ui/Card";
-import { ProgressChart } from "../components/charts/ProgressChart";
 import { StatsPeriod, useProgress } from "../features/progress/useProgress";
 import { Button } from "../components/ui/Button";
+
+const ProgressChart = lazy(() => import("../components/charts/ProgressChart").then((m) => ({ default: m.ProgressChart })));
 
 export function ProgressPage() {
   const [period, setPeriod] = useState<StatsPeriod>("week");
@@ -17,7 +18,13 @@ export function ProgressPage() {
         <Button onClick={() => setPeriod("3months")}>3 месяца</Button>
         <Button onClick={() => setPeriod("year")}>12 месяцев</Button>
       </div>
-      {isLoading ? <p>Загрузка...</p> : <ProgressChart points={data?.points ?? []} />}
+      {isLoading ? (
+        <p>Загрузка...</p>
+      ) : (
+        <Suspense fallback={<p>Загрузка графика...</p>}>
+          <ProgressChart points={data?.points ?? []} />
+        </Suspense>
+      )}
     </Card>
   );
 }
