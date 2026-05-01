@@ -1,0 +1,98 @@
+@{
+    ViewData["Title"] = "Запуск...";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <title>Dopamine Fitness — запуск</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a0f;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 48px 56px;
+            text-align: center;
+            backdrop-filter: blur(16px);
+            max-width: 420px;
+        }
+        .logo { font-size: 2.4rem; font-weight: 800; color: #84cc16; margin-bottom: 8px; }
+        .sub  { font-size: 0.9rem; color: #888; margin-bottom: 32px; }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid rgba(132,204,22,0.2);
+            border-top-color: #84cc16;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 24px;
+        }
+        @@keyframes spin { to { transform: rotate(360deg); } }
+        .status { font-size: 0.85rem; color: #aaa; }
+        .status span { color: #84cc16; }
+        .btn {
+            display: inline-block;
+            margin-top: 24px;
+            padding: 10px 24px;
+            background: #84cc16;
+            color: #000;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo">⚡ Dopamine</div>
+        <div class="sub">Fitness Tracker · Dev Mode</div>
+        <div class="spinner" id="spin"></div>
+        <div class="status" id="status">Запускаем <span>Vite</span> + <span>Wrangler</span>...</div>
+        <a href="http://localhost:5173" class="btn" style="display:none" id="openBtn">Открыть приложение →</a>
+    </div>
+    <script>
+        const LOCAL = 'http://localhost:5173';
+        let attempts = 0;
+
+        async function tryRedirect() {
+            attempts++;
+            document.getElementById('status').innerHTML =
+                `Ожидаем Vite... <span>(попытка ${attempts})</span>`;
+            try {
+                // ping vite через img src (обходим CORS)
+                await new Promise((res, rej) => {
+                    const img = new Image();
+                    img.onload = res;
+                    img.onerror = res; // даже ошибка = сервер ответил
+                    img.src = LOCAL + '/favicon.ico?t=' + Date.now();
+                    setTimeout(rej, 1500);
+                });
+                document.getElementById('spin').style.borderTopColor = '#22c55e';
+                document.getElementById('status').innerHTML = `<span>Готово! Открываем...</span>`;
+                setTimeout(() => { window.location.href = LOCAL; }, 400);
+            } catch {
+                if (attempts < 20) setTimeout(tryRedirect, 1500);
+                else {
+                    document.getElementById('status').innerHTML = 'Vite не отвечает. Запусти вручную.';
+                    document.getElementById('openBtn').style.display = 'inline-block';
+                    document.getElementById('spin').style.display = 'none';
+                }
+            }
+        }
+
+        // Первая попытка через 2 сек — даём время wrangler + vite подняться
+        setTimeout(tryRedirect, 2000);
+    </script>
+</body>
+</html>

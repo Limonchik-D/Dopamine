@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "wrangler dev --local --persist",
     "dev:web": "npm --prefix ./web run dev",
+    "dev:all": "concurrently -n \"workers,vite\" -c \"cyan,green\" \"wrangler dev --local --persist\" \"npm --prefix ./web run dev\"",
     "web:install": "npm --prefix ./web install",
     "web:type-check": "npm --prefix ./web run type-check",
     "web:build": "npm --prefix ./web run build",
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240910.0",
     "@types/node": "^20.14.0",
+    "concurrently": "^9.2.1",
     "eslint": "^9.0.0",
     "typescript": "^5.5.0",
     "vitest": "^1.6.0",

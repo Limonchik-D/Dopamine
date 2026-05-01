@@ -6,8 +6,18 @@ namespace Dopamine.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IWebHostEnvironment _env;
+
+        public HomeController(IWebHostEnvironment env)
+        {
+            _env = env;
+        }
+
         public IActionResult Index()
         {
+            if (_env.IsDevelopment())
+                return View("DevRedirect");
+
             ViewBag.ProductionUrl = "https://dopamine.limonmilion2007.workers.dev";
             return View();
         }
