@@ -16,7 +16,7 @@ namespace Dopamine.Controllers
         public IActionResult Index()
         {
             if (_env.IsDevelopment())
-                return View("DevRedirect");
+                return Redirect("http://localhost:5173");
 
             ViewBag.ProductionUrl = "https://dopamine.limonmilion2007.workers.dev";
             return View();
