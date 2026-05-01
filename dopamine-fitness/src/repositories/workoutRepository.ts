@@ -195,4 +195,97 @@ export class WorkoutRepository {
       .all<Set>();
     return rows.results;
   }
+
+  async updateSet(
+    id: number,
+    userId: number,
+    fields: Partial<Pick<Set, "weight" | "reps" | "rest_seconds" | "rir" | "completed">>
+  ): Promise<Set | null> {
+    const sets: string[] = [];
+    const values: unknown[] = [];
+    let i = 1;
+
+    if (fields.weight !== undefined) { sets.push(`weight = ?${i++}`); values.push(fields.weight); }
+    if (fields.reps !== undefined) { sets.push(`reps = ?${i++}`); values.push(fields.reps); }
+    if (fields.rest_seconds !== undefined) { sets.push(`rest_seconds = ?${i++}`); values.push(fields.rest_seconds); }
+    if (fields.rir !== undefined) { sets.push(`rir = ?${i++}`); values.push(fields.rir); }
+    if (fields.completed !== undefined) { sets.push(`completed = ?${i++}`); values.push(fields.completed ? 1 : 0); }
+
+    if (sets.length === 0) {
+      return this.db
+        .prepare(
+          `SELECT s.* FROM sets s
+           JOIN workout_exercises we ON we.id = s.workout_exercise_id
+           JOIN workouts w ON w.id = we.workout_id
+           WHERE s.id = ?1 AND w.user_id = ?2`
+        )
+        .bind(id, userId)
+        .first<Set>() ?? null;
+    }
+
+    values.push(id, userId);
+    const row = await this.db
+      .prepare(
+        `UPDATE sets SET ${sets.join(", ")}
+         WHERE id = ?${i++}
+           AND workout_exercise_id IN (
+             SELECT we.id FROM workout_exercises we
+             JOIN workouts w ON w.id = we.workout_id
+             WHERE w.user_id = ?${i++} AND w.deleted_at IS NULL
+           )
+         RETURNING *`
+      )
+      .bind(...values)
+      .first<Set>();
+    return row ?? null;
+  }
+
+  async deleteSet(id: number, userId: number): Promise<boolean> {
+    const result = await this.db
+      .prepare(
+        `DELETE FROM sets WHERE id = ?1
+           AND workout_exercise_id IN (
+             SELECT we.id FROM workout_exercises we
+             JOIN workouts w ON w.id = we.workout_id
+             WHERE w.user_id = ?2 AND w.deleted_at IS NULL
+           )`
+      )
+      .bind(id, userId)
+      .run();
+    return (result.meta.changes ?? 0) > 0;
+  }
+
+  async deleteWorkoutExercise(id: number, userId: number): Promise<boolean> {
+    const result = await this.db
+      .prepare(
+        `DELETE FROM workout_exercises WHERE id = ?1
+           AND workout_id IN (
+             SELECT id FROM workouts WHERE user_id = ?2 AND deleted_at IS NULL
+           )`
+      )
+      .bind(id, userId)
+      .run();
+    return (result.meta.changes ?? 0) > 0;
+  }
+
+  async getExercisesWithSets(workoutId: number): Promise<(WorkoutExercise & { sets: Set[] })[]> {
+    const exercises = await this.getExercises(workoutId);
+    if (exercises.length === 0) return [];
+
+    const ids = exercises.map((e) => e.id);
+    const placeholders = ids.map((_, i) => `?${i + 1}`).join(", ");
+    const rows = await this.db
+      .prepare(`SELECT * FROM sets WHERE workout_exercise_id IN (${placeholders}) ORDER BY workout_exercise_id ASC, set_number ASC`)
+      .bind(...ids)
+      .all<Set>();
+
+    const setsMap = new Map<number, Set[]>();
+    for (const s of rows.results) {
+      const arr = setsMap.get(s.workout_exercise_id) ?? [];
+      arr.push(s);
+      setsMap.set(s.workout_exercise_id, arr);
+    }
+
+    return exercises.map((e) => ({ ...e, sets: setsMap.get(e.id) ?? [] }));
+  }
 }

@@ -1,0 +1,210 @@
+/* ─── My Exercises ───────────────────────────────────────────────────── */
+
+.my-exercises-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-md);
+}
+
+@media (max-width: 480px) {
+  .my-exercises-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-sm); }
+}
+
+.my-exercise-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.my-exercise-card:hover {
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--border));
+  box-shadow: 0 8px 28px rgba(2,8,24,0.5), 0 0 16px color-mix(in oklab, var(--accent) 18%, transparent);
+}
+
+.my-exercise-photo {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+  background: color-mix(in oklab, var(--surface) 85%, transparent);
+}
+
+.my-exercise-photo-placeholder {
+  width: 100%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  font-size: 2.5rem;
+  background: color-mix(in oklab, var(--surface) 80%, transparent);
+  color: var(--muted);
+}
+
+.my-exercise-body {
+  padding: var(--space-sm);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.my-exercise-name { font-weight: 600; font-size: var(--font-sm); }
+.my-exercise-meta { font-size: 12px; color: var(--muted); }
+.my-exercise-desc {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.my-exercise-actions {
+  display: flex;
+  gap: 4px;
+  padding: 0 var(--space-sm) var(--space-sm);
+}
+
+/* ─── Create / Edit Form ─────────────────────────────────────────────── */
+
+.create-exercise-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+@media (max-width: 480px) {
+  .form-row { grid-template-columns: 1fr; }
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-field label {
+  font-size: var(--font-sm);
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.form-field input,
+.form-field select {
+  max-width: 100%;
+}
+
+.form-field textarea {
+  width: 100%;
+  min-height: 80px;
+  resize: vertical;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface) 80%, transparent);
+  color: var(--text);
+  font-family: inherit;
+  font-size: var(--font-sm);
+  backdrop-filter: blur(10px);
+  box-sizing: border-box;
+}
+
+.form-field textarea:focus {
+  outline: none;
+  border-color: color-mix(in oklab, var(--accent) 60%, var(--border));
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 24%, transparent);
+}
+
+/* ─── Photo Upload ───────────────────────────────────────────────────── */
+
+.photo-upload-area {
+  border: 2px dashed color-mix(in oklab, var(--accent) 35%, var(--border));
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  position: relative;
+  background: color-mix(in oklab, var(--surface) 70%, transparent);
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+}
+
+.photo-upload-area:hover {
+  border-color: color-mix(in oklab, var(--accent) 65%, var(--border));
+  background: color-mix(in oklab, var(--accent) 8%, var(--surface));
+}
+
+.photo-upload-area.has-file {
+  border-style: solid;
+  border-color: color-mix(in oklab, var(--accent) 55%, var(--border));
+}
+
+.photo-upload-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.photo-preview {
+  width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  border-radius: 12px;
+  display: block;
+}
+
+.photo-upload-icon { font-size: 2rem; pointer-events: none; }
+
+.photo-upload-hint {
+  color: var(--muted);
+  font-size: var(--font-sm);
+  pointer-events: none;
+}
+
+.photo-upload-hint strong { color: var(--accent); }
+
+.upload-progress {
+  height: 4px;
+  background: color-mix(in oklab, var(--accent) 20%, var(--border));
+  border-radius: 2px;
+  margin-top: var(--space-xs);
+  overflow: hidden;
+  width: 100%;
+}
+
+.upload-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  border-radius: 2px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px color-mix(in oklab, var(--accent) 50%, transparent);
+}
+
+/* ─── Inline Edit ────────────────────────────────────────────────────── */
+
+.edit-form-inline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border-top: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface) 60%, transparent);
+}

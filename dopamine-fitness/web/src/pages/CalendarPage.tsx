@@ -35,6 +35,10 @@ export function CalendarPage() {
             {checkedInToday ? "Сегодня уже отмечено" : "Отметить сегодня"}
           </Button>
         </div>
+        <div className="glass-pill-row">
+          <span className="glass-pill">Бейдж: {getBadge(streak)}</span>
+          <span className="glass-pill">Эта неделя: {thisWeekDone}/7</span>
+        </div>
       </Card>
 
       <Card>

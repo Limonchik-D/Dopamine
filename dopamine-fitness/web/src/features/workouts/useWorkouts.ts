@@ -6,6 +6,29 @@ export type Workout = {
   name: string;
   description: string | null;
   workout_date: string;
+  notes: string | null;
+};
+
+export type WorkoutSet = {
+  id: number;
+  workout_exercise_id: number;
+  set_number: number;
+  weight: number | null;
+  reps: number | null;
+  rest_seconds: number | null;
+  rir: number | null;
+  completed: boolean;
+};
+
+export type WorkoutExerciseEntry = {
+  id: number;
+  workout_id: number;
+  exercise_id: number | null;
+  custom_exercise_id: number | null;
+  order_index: number;
+  target_muscle: string | null;
+  equipment: string | null;
+  sets: WorkoutSet[];
 };
 
 export function useWorkouts() {
@@ -18,7 +41,8 @@ export function useWorkouts() {
 export function useWorkout(id: string | undefined) {
   return useQuery({
     queryKey: ["workout", id],
-    queryFn: () => apiClient.get<Workout & { exercises: unknown[] }>(`/workouts/${id}`),
+    queryFn: () =>
+      apiClient.get<Workout & { exercises: WorkoutExerciseEntry[] }>(`/workouts/${id}`),
     enabled: Boolean(id),
   });
 }
@@ -33,3 +57,67 @@ export function useCreateWorkout() {
     },
   });
 }
+
+export function useDeleteWorkout() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => apiClient.delete<unknown>(`/workouts/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workouts"] });
+    },
+  });
+}
+
+export function useAddExerciseToWorkout(workoutId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { exercise_id?: number; custom_exercise_id?: number; order_index?: number; target_muscle?: string; equipment?: string }) =>
+      apiClient.post<WorkoutExerciseEntry>(`/workouts/${workoutId}/exercises`, { order_index: 0, ...payload }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workout", String(workoutId)] });
+    },
+  });
+}
+
+export function useRemoveExerciseFromWorkout(workoutId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (weId: number) => apiClient.delete<unknown>(`/workouts/exercises/${weId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workout", String(workoutId)] });
+    },
+  });
+}
+
+export function useAddSet(workoutId: number, weId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { set_number: number; weight?: number; reps?: number; rest_seconds?: number; rir?: number; completed?: boolean }) =>
+      apiClient.post<WorkoutSet>(`/workouts/exercises/${weId}/sets`, { completed: false, ...payload }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workout", String(workoutId)] });
+    },
+  });
+}
+
+export function useUpdateSet(workoutId: number, weId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ setId, payload }: { setId: number; payload: Partial<{ weight: number; reps: number; rest_seconds: number; rir: number; completed: boolean }> }) =>
+      apiClient.patch<WorkoutSet>(`/workouts/exercises/${weId}/sets/${setId}`, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workout", String(workoutId)] });
+    },
+  });
+}
+
+export function useDeleteSet(workoutId: number, weId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (setId: number) => apiClient.delete<unknown>(`/workouts/exercises/${weId}/sets/${setId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workout", String(workoutId)] });
+    },
+  });
+}
+

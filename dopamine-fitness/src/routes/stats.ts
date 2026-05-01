@@ -52,3 +52,42 @@ statsRoutes.get("/3months", async (c) => {
 statsRoutes.get("/year", async (c) => {
   return handleStatsPeriod(c, "year");
 });
+
+// GET /stats/exercise/:id?period=week|month|3months|year
+statsRoutes.get("/exercise/:id", async (c) => {
+  const userId = c.get("userId") as number;
+  const exerciseId = parseInt(c.req.param("id"), 10);
+  const period = (c.req.query("period") ?? "month") as StatsPeriod;
+  const config = getAppConfig(c.env);
+
+  const cacheKey = `stats:exercise:${userId}:${exerciseId}:${period}`;
+  const cached = await c.env.KV.get(cacheKey, "json");
+  if (cached) {
+    c.header("X-Cache", "HIT");
+    return c.json({ success: true, data: cached });
+  }
+
+  const service = new StatsService(c.env.DB);
+  const data = await service.getExerciseProgress(userId, exerciseId, period);
+
+  await c.env.KV.put(cacheKey, JSON.stringify(data), {
+    expirationTtl: config.cache.statsTtlSeconds,
+  });
+
+  c.header("X-Cache", "MISS");
+  return c.json({ success: true, data });
+});
+
+// GET /stats/summary — общая сводка (кол-во тренировок, суммарный объём, рекорд)
+statsRoutes.get("/summary", async (c) => {
+  const userId = c.get("userId") as number;
+  const cacheKey = `stats:summary:${userId}`;
+  const cached = await c.env.KV.get(cacheKey, "json");
+  if (cached) return c.json({ success: true, data: cached });
+
+  const service = new StatsService(c.env.DB);
+  const data = await service.getSummary(userId);
+
+  await c.env.KV.put(cacheKey, JSON.stringify(data), { expirationTtl: 300 });
+  return c.json({ success: true, data });
+});

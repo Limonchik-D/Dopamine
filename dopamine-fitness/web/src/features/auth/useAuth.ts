@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../services/apiClient";
 import { clearAuthToken, getAuthToken, setAuthToken } from "../../services/auth";
 import { useUiSettings } from "../settings/useUiSettings";
@@ -11,7 +11,25 @@ export type MeResponse = {
   email: string;
   username: string;
   role: "user" | "admin";
+  profile?: {
+    avatar_url: string | null;
+    bio: string | null;
+  } | null;
 };
+
+export type PatchMePayload = {
+  username?: string;
+  bio?: string;
+  avatar_url?: string;
+};
+
+export function usePatchMe() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: PatchMePayload) => apiClient.patch<MeResponse>("/me", payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["me"] }),
+  });
+}
 
 export function useMe() {
   return useQuery({

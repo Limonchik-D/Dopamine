@@ -1,8 +1,46 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dopamine Fitness";
+    var appUrl = ViewBag.ProductionUrl as string ?? "https://dopamine.limonmilion2007.workers.dev";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="hero-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
 </div>
+
+<section class="hero">
+    <div class="hero-card glass">
+        <div class="hero-badge">⚡ MVP · Cloudflare Workers</div>
+        <h1 class="hero-title">Dopamine<br /><span class="accent">Fitness</span></h1>
+        <p class="hero-sub">Минималистичный трекер тренировок. Следи за прогрессом, строй привычки.</p>
+
+        <div class="hero-actions">
+            <a class="btn-primary" href="@appUrl">Открыть приложение →</a>
+        </div>
+    </div>
+
+    <div class="features">
+        <div class="feat glass">
+            <div class="feat-icon">🏋️</div>
+            <h3>Тренировки</h3>
+            <p>Создавай планы, добавляй упражнения, отслеживай подходы и веса.</p>
+        </div>
+        <div class="feat glass">
+            <div class="feat-icon">📈</div>
+            <h3>Прогресс</h3>
+            <p>Графики роста, стрики посещений, история за любой период.</p>
+        </div>
+        <div class="feat glass">
+            <div class="feat-icon">🗓️</div>
+            <h3>Календарь</h3>
+            <p>Визуальная карта активности — как GitHub, только для спортзала.</p>
+        </div>
+        <div class="feat glass">
+            <div class="feat-icon">⚙️</div>
+            <h3>Настройки</h3>
+            <p>Тема, единицы измерения, цели — всё под тебя.</p>
+        </div>
+    </div>
+</section>
+

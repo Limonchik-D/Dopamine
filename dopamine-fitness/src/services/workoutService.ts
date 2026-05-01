@@ -79,9 +79,14 @@ export class WorkoutService {
     );
   }
 
-  async getExercises(workoutId: number, userId: number): Promise<WorkoutExercise[]> {
+  async getExercises(workoutId: number, userId: number): Promise<(WorkoutExercise & { sets: Set[] })[]> {
     await this.get(workoutId, userId);
-    return this.repo.getExercises(workoutId);
+    return this.repo.getExercisesWithSets(workoutId);
+  }
+
+  async removeExercise(workoutExerciseId: number, userId: number): Promise<void> {
+    const deleted = await this.repo.deleteWorkoutExercise(workoutExerciseId, userId);
+    if (!deleted) throw new Error("Not found");
   }
 
   // ─── Sets ───────────────────────────────────────────────────────────────────
@@ -122,5 +127,22 @@ export class WorkoutService {
     }
 
     return set;
+  }
+
+  async updateSet(setId: number, userId: number, input: Partial<SetInput>): Promise<Set> {
+    const set = await this.repo.updateSet(setId, userId, {
+      weight: input.weight,
+      reps: input.reps,
+      rest_seconds: input.rest_seconds,
+      rir: input.rir,
+      completed: input.completed,
+    });
+    if (!set) throw new Error("Not found");
+    return set;
+  }
+
+  async deleteSet(setId: number, userId: number): Promise<void> {
+    const deleted = await this.repo.deleteSet(setId, userId);
+    if (!deleted) throw new Error("Not found");
   }
 }

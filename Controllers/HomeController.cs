@@ -8,6 +8,7 @@ namespace Dopamine.Controllers
     {
         public IActionResult Index()
         {
+            ViewBag.ProductionUrl = "https://dopamine.limonmilion2007.workers.dev";
             return View();
         }
 

@@ -80,3 +80,31 @@ workoutRoutes.post("/exercises/:weId/sets", async (c) => {
   await invalidateStatsCache(c.env, userId);
   return c.json({ success: true, data: set }, 201);
 });
+
+workoutRoutes.patch("/exercises/:weId/sets/:setId", async (c) => {
+  const userId = c.get("userId") as number;
+  const setId = parseInt(c.req.param("setId"), 10);
+  const input = validate(setSchema.partial(), await c.req.json());
+  const service = new WorkoutService(c.env.DB);
+  const set = await service.updateSet(setId, userId, input);
+  await invalidateStatsCache(c.env, userId);
+  return c.json({ success: true, data: set });
+});
+
+workoutRoutes.delete("/exercises/:weId/sets/:setId", async (c) => {
+  const userId = c.get("userId") as number;
+  const setId = parseInt(c.req.param("setId"), 10);
+  const service = new WorkoutService(c.env.DB);
+  await service.deleteSet(setId, userId);
+  await invalidateStatsCache(c.env, userId);
+  return c.json({ success: true, message: "Подход удалён" });
+});
+
+workoutRoutes.delete("/exercises/:weId", async (c) => {
+  const userId = c.get("userId") as number;
+  const weId = parseInt(c.req.param("weId"), 10);
+  const service = new WorkoutService(c.env.DB);
+  await service.removeExercise(weId, userId);
+  await invalidateStatsCache(c.env, userId);
+  return c.json({ success: true, message: "Упражнение удалено" });
+});

@@ -37,6 +37,12 @@ export function AdminPage() {
             Система: {diagnostics.data.ready ? "готова" : "degraded"} · DB: {diagnostics.data.dependencies.db ? "ok" : "fail"} · KV: {diagnostics.data.dependencies.kv ? "ok" : "fail"}
           </p>
         )}
+        {diagnostics.data && (
+          <div className="glass-pill-row">
+            <span className="glass-pill">Status: {diagnostics.data.ready ? "ready" : "degraded"}</span>
+            <span className="glass-pill">Migration: {diagnostics.data.latestMigration?.name ?? "n/a"}</span>
+          </div>
+        )}
         {overview.isLoading ? (
           <p>Загрузка метрик...</p>
         ) : (

@@ -1,0 +1,229 @@
+/* ============================================================
+   Progress Page
+   ============================================================ */
+
+.progress-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.glass-stat-card {
+  background: color-mix(in oklab, var(--surface) 70%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+  border-radius: var(--radius-lg);
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  box-shadow: 0 4px 18px color-mix(in oklab, var(--accent) 10%, transparent);
+  transition: box-shadow 0.2s;
+}
+
+.glass-stat-card:hover {
+  box-shadow: 0 6px 26px color-mix(in oklab, var(--accent) 22%, transparent);
+}
+
+.glass-stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.glass-stat-label {
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Period / metric switcher row */
+.period-switcher {
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+/* Exercise filter */
+.progress-exercise-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.progress-exercise-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.progress-exercise-dropdown {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-height: 220px;
+  overflow-y: auto;
+  box-shadow: 0 8px 30px color-mix(in oklab, #000 40%, transparent);
+}
+
+.progress-exercise-option {
+  padding: 0.55rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text);
+  transition: background 0.15s;
+}
+
+.progress-exercise-option:hover,
+.progress-exercise-option.is-selected {
+  background: color-mix(in oklab, var(--accent) 15%, transparent);
+  color: var(--accent);
+}
+
+.empty-chart {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+/* ============================================================
+   Profile Page
+   ============================================================ */
+
+.profile-avatar-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0 1rem;
+}
+
+.profile-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--accent);
+  box-shadow: 0 0 18px color-mix(in oklab, var(--accent) 30%, transparent);
+}
+
+.profile-avatar-placeholder {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--accent) 20%, var(--surface));
+  border: 3px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--accent);
+  box-shadow: 0 0 18px color-mix(in oklab, var(--accent) 25%, transparent);
+}
+
+.profile-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+  gap: 1rem;
+}
+
+.profile-info-row:last-of-type {
+  border-bottom: none;
+}
+
+.profile-info-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.profile-info-value {
+  font-size: 0.95rem;
+  color: var(--text);
+  text-align: right;
+  word-break: break-all;
+}
+
+.profile-badge {
+  background: color-mix(in oklab, var(--accent) 18%, transparent);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.15rem 0.6rem;
+  border-radius: 99px;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   Settings Page
+   ============================================================ */
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid color-mix(in oklab, var(--border) 40%, transparent);
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+.settings-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  min-width: 100px;
+}
+
+/* Toggle switch */
+.settings-toggle {
+  width: 48px;
+  height: 26px;
+  border-radius: 99px;
+  border: 2px solid var(--border);
+  background: color-mix(in oklab, var(--surface) 80%, var(--muted));
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.settings-toggle.is-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 10px color-mix(in oklab, var(--accent) 45%, transparent);
+}
+
+.settings-toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--text);
+  transition: transform 0.2s, background 0.2s;
+}
+
+.settings-toggle.is-on .settings-toggle-knob {
+  transform: translateX(22px);
+  background: #fff;
+}
