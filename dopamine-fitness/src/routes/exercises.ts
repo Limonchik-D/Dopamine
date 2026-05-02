@@ -25,6 +25,10 @@ exerciseRoutes.get("/", async (c) => {
   }
 
   const result = await service.list(filters);
+
+  // Keep list endpoint fast: translate only in the background for currently visible items.
+  c.executionCtx.waitUntil(service.backfillVisibleTranslations(result.exercises));
+
   return c.json({ success: true, data: result });
 });
 
@@ -61,7 +65,7 @@ exerciseRoutes.get("/:id", async (c) => {
   return c.json({ success: true, data: exercise });
 });
 
-// POST /exercises/:id/enrich — on-demand enrichment (GIF + difficulty + instructions)
+// POST /exercises/:id/enrich — on-demand enrichment (wger image/description + GIF + difficulty)
 // Called when user clicks "GIF" or opens exercise detail.
 // Results are cached in KV (7 days) and persisted to D1, so subsequent calls are free.
 exerciseRoutes.post("/:id/enrich", async (c) => {

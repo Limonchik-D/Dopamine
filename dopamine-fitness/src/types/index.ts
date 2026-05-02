@@ -149,12 +149,19 @@ export interface WorkoutExercise {
   // Joined enrichment fields (present when loaded via getExercises JOIN)
   exercise_name?: string | null;
   exercise_gif_url?: string | null;
+  exercise_image_url?: string | null;
+  exercise_instructions_en?: string | null;
+  exercise_instructions_ru?: string | null;
   exercise_target?: string | null;
   exercise_equipment?: string | null;
   custom_name?: string | null;
   custom_photo_key?: string | null;
+  custom_description?: string | null;
   custom_target?: string | null;
   custom_equipment?: string | null;
+  // Suggested values from last completed workout for the same exercise
+  last_weight?: number | null;
+  last_reps?: number | null;
 }
 
 export interface Set {
@@ -247,13 +254,19 @@ export interface WgerExercise {
   id: number;
   uuid: string;
   category: { id: number; name: string };
-  muscles: { id: number; name_en: string; name: string }[];
-  muscles_secondary: { id: number; name_en: string; name: string }[];
+  muscles: { id: number; name_en: string; name: string; image_url_main?: string | null; image_url_secondary?: string | null }[];
+  muscles_secondary: { id: number; name_en: string; name: string; image_url_main?: string | null; image_url_secondary?: string | null }[];
   equipment: { id: number; name: string }[];
   translations: {
     id: number;
     language: number;
     name: string;
     description: string;
+  }[];
+  images?: {
+    id: number;
+    image: string;
+    is_main: boolean;
+    status?: string;
   }[];
 }

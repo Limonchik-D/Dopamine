@@ -1,15 +1,18 @@
 import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useCreateWorkout, useWorkouts } from "../features/workouts/useWorkouts";
+import { useCreateWorkout, useDuplicateWorkout, useWorkouts } from "../features/workouts/useWorkouts";
 import { toDiagnosticSuffix, toUserMessage } from "../services/apiErrors";
 
 export function WorkoutsPage() {
   const navigate = useNavigate();
   const { data, isLoading } = useWorkouts();
   const createWorkout = useCreateWorkout();
+  const duplicateWorkout = useDuplicateWorkout();
   const [modalOpen, setModalOpen] = useState(false);
   const [name, setName] = useState("");
   const [errorText, setErrorText] = useState("");
+  const [quickError, setQuickError] = useState("");
+  const [duplicateError, setDuplicateError] = useState("");
 
   const openModal = () => { setName(""); setErrorText(""); setModalOpen(true); };
   const closeModal = () => setModalOpen(false);
@@ -30,15 +33,54 @@ export function WorkoutsPage() {
     }
   };
 
+  const onQuickStart = async () => {
+    setQuickError("");
+    try {
+      const today = new Date();
+      const dateIso = today.toISOString().slice(0, 10);
+      const dateRu = today.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit" });
+      const w = await createWorkout.mutateAsync({
+        name: `Тренировка ${dateRu}`,
+        workout_date: dateIso,
+      });
+      navigate(`/workouts/${w.id}`);
+    } catch (error) {
+      setQuickError(`${toUserMessage(error)}${toDiagnosticSuffix(error)}`);
+    }
+  };
+
   const workouts = data?.workouts ?? [];
+
+  const onDuplicateToday = async (id: number, name: string) => {
+    setDuplicateError("");
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const w = await duplicateWorkout.mutateAsync({
+        id,
+        workout_date: today,
+        name: `${name} (сегодня)`,
+      });
+      navigate(`/workouts/${w.id}`);
+    } catch (error) {
+      setDuplicateError(`${toUserMessage(error)}${toDiagnosticSuffix(error)}`);
+    }
+  };
 
   return (
     <div className="stack">
-      {/* Кнопка создания */}
-      <button className="wo-create-btn" onClick={openModal}>
-        <span className="wo-create-icon">＋</span>
-        Создать тренировку
+      {/* Быстрый старт */}
+      <button className="wo-create-btn" onClick={onQuickStart} disabled={createWorkout.isPending}>
+        <span className="wo-create-icon">▶</span>
+        {createWorkout.isPending ? "Запуск..." : "Начать тренировку сейчас"}
       </button>
+
+      <div className="row" style={{ gap: "var(--space-sm)", flexWrap: "wrap" }}>
+        <button className="btn btn-ghost" onClick={() => navigate("/workouts/new")}>🧩 Собрать план</button>
+        <button className="btn btn-ghost" onClick={openModal}>＋ Создать вручную</button>
+      </div>
+
+      {quickError && <p className="text-error">{quickError}</p>}
+      {duplicateError && <p className="text-error">{duplicateError}</p>}
 
       {/* Список тренировок */}
       {isLoading ? (
@@ -47,13 +89,13 @@ export function WorkoutsPage() {
         <div className="wo-empty">
           <div className="wo-empty-icon">🏋️</div>
           <p>Нет тренировок</p>
-          <span>Нажми «Создать тренировку» чтобы начать</span>
+          <span>Нажми «Начать тренировку сейчас» чтобы сразу записывать подходы</span>
         </div>
       ) : (
         <div className="stack">
           {workouts.map((w) => (
-            <Link key={w.id} to={`/workouts/${w.id}`} style={{ textDecoration: "none" }}>
-              <div className="wo-card">
+            <div key={w.id} className="wo-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "var(--space-sm)" }}>
+              <Link to={`/workouts/${w.id}`} style={{ textDecoration: "none", flex: 1, minWidth: 0 }}>
                 <div className="wo-card-left">
                   <div className="wo-card-name">{w.name}</div>
                   <div className="wo-card-date">
@@ -62,9 +104,19 @@ export function WorkoutsPage() {
                     })}
                   </div>
                 </div>
+              </Link>
+              <div className="row" style={{ gap: "6px", flexShrink: 0 }}>
+                <button
+                  className="btn btn-ghost"
+                  onClick={() => onDuplicateToday(w.id, w.name)}
+                  disabled={duplicateWorkout.isPending}
+                  title="Скопировать эту тренировку на сегодня"
+                >
+                  {duplicateWorkout.isPending ? "..." : "⧉ Копия"}
+                </button>
                 <span className="wo-card-arrow">›</span>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}

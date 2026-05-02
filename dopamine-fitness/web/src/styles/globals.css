@@ -1323,17 +1323,49 @@ input::placeholder, textarea::placeholder { color: var(--muted); }
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.builder-exercise-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.builder-exercise-preview {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 1rem;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.builder-exercise-preview:hover {
+  color: var(--accent);
+  border-color: var(--border-accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
 .builder-exercise-remove {
   background: none;
-  border: none;
+  border: 1px solid var(--border);
   color: var(--muted);
-  font-size: 1.1rem;
+  font-size: 1rem;
   cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 6px;
-  transition: color 0.15s, background 0.15s;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
-.builder-exercise-remove:hover { color: #ff4d4d; background: rgba(255,77,77,0.12); }
+.builder-exercise-remove:hover {
+  color: #ff4d4d;
+  border-color: rgba(255, 77, 77, 0.35);
+  background: rgba(255,77,77,0.12);
+}
 
 /* Sets list */
 .builder-sets-list { display: flex; flex-direction: column; gap: 6px; }
@@ -1490,6 +1522,66 @@ input::placeholder, textarea::placeholder { color: var(--muted); }
 }
 .builder-picker-item:hover { background: var(--surface); }
 .builder-picker-item-name { font-weight: 600; }
+
+/* Exercise preview modal */
+.builder-preview-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  background: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+
+@media (min-width: 640px) {
+  .builder-preview-overlay {
+    align-items: center;
+    padding: var(--space-md);
+  }
+}
+
+.builder-preview {
+  width: 100%;
+  max-width: 560px;
+  max-height: 78vh;
+  overflow-y: auto;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  padding: var(--space-md);
+  animation: slideUp 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .builder-preview {
+    border-radius: var(--radius-xl);
+    max-height: 72vh;
+  }
+}
+
+.builder-preview-media {
+  width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.builder-preview-placeholder {
+  width: 100%;
+  height: 220px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 3rem;
+}
 
 /* Success screen */
 .builder-success {
@@ -1691,6 +1783,25 @@ input::placeholder, textarea::placeholder { color: var(--muted); }
   display: flex; align-items: center; gap: 8px; flex-shrink: 0;
 }
 .wd-set-progress { font-size: var(--font-sm); color: var(--muted); white-space: nowrap; }
+.wd-exercise-preview {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 1rem;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.wd-exercise-preview:hover {
+  color: var(--accent);
+  border-color: var(--border-accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
 .wd-exercise-del {
   background: none; border: none; cursor: pointer;
   color: var(--muted); font-size: 1rem; padding: 4px 6px; border-radius: 8px;
@@ -1773,6 +1884,93 @@ input::placeholder, textarea::placeholder { color: var(--muted); }
   white-space: nowrap;
 }
 
+/* Workout exercise preview modal */
+.wd-preview-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  background: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+
+@media (min-width: 640px) {
+  .wd-preview-overlay {
+    align-items: center;
+    padding: var(--space-md);
+  }
+}
+
+.wd-preview {
+  width: 100%;
+  max-width: 560px;
+  max-height: 78vh;
+  overflow-y: auto;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  padding: var(--space-md);
+  animation: slideUp 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .wd-preview {
+    border-radius: var(--radius-xl);
+    max-height: 72vh;
+  }
+}
+
+.wd-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+}
+
+.wd-preview-title {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.wd-preview-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.wd-preview-close:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.wd-preview-media {
+  width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.wd-preview-placeholder {
+  width: 100%;
+  height: 220px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 3rem;
+}
+
 /* Add exercise button */
 .wd-add-exercise-btn {
   display: flex; align-items: center; justify-content: center; gap: 10px;
@@ -1853,6 +2051,30 @@ input::placeholder, textarea::placeholder { color: var(--muted); }
 }
 .auth-body-field { display: flex; flex-direction: column; gap: 5px; }
 .auth-body-label { font-size: 0.78rem; color: var(--text-muted); padding-left: 2px; }
+
+.auth-form {
+  margin-bottom: var(--space-sm);
+}
+
+.auth-action-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.auth-toggle-btn {
+  width: 100%;
+  justify-content: center;
+  margin-top: var(--space-md);
+  white-space: normal;
+  text-align: center;
+  line-height: 1.2;
+}
+
+@media (max-width: 640px) {
+  .auth-body-row {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* ═══════════════════════════════════════════════
    REPORT PAGE

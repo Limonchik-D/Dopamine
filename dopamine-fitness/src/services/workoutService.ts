@@ -6,7 +6,6 @@ import type {
   SetInput,
 } from "../validators/schemas.js";
 import { WorkoutRepository } from "../repositories/workoutRepository.js";
-import { calcOneRM, calcVolume } from "../utils/helpers.js";
 import { StatsRepository } from "../repositories/statsRepository.js";
 
 export class WorkoutService {
@@ -42,6 +41,27 @@ export class WorkoutService {
       input.workout_date,
       input.notes ?? null
     );
+  }
+
+  async duplicateWorkout(
+    sourceWorkoutId: number,
+    userId: number,
+    targetDate: string,
+    targetName?: string
+  ): Promise<Workout> {
+    const source = await this.repo.findById(sourceWorkoutId, userId);
+    if (!source) throw new Error("Not found");
+
+    const created = await this.repo.create(
+      userId,
+      targetName?.trim() || `${source.name} (копия)`,
+      source.description,
+      targetDate,
+      source.notes
+    );
+
+    await this.repo.copyWorkoutExercisesAndSets(sourceWorkoutId, created.id, userId);
+    return created;
   }
 
   async update(
@@ -81,7 +101,7 @@ export class WorkoutService {
 
   async getExercises(workoutId: number, userId: number): Promise<(WorkoutExercise & { sets: Set[] })[]> {
     await this.get(workoutId, userId);
-    return this.repo.getExercisesWithSets(workoutId);
+    return this.repo.getExercisesWithSets(workoutId, userId);
   }
 
   async removeExercise(workoutExerciseId: number, userId: number): Promise<void> {
@@ -109,20 +129,11 @@ export class WorkoutService {
       input.completed
     );
 
-    // Auto-update progress snapshot
-    if (input.completed && input.weight && input.reps && we.exercise_id) {
+    // Keep snapshot in sync after any set mutation.
+    if (we.exercise_id) {
       const workout = await this.repo.findById(we.workout_id, userId);
       if (workout) {
-        await this.statsRepo.upsertSnapshot({
-          user_id: userId,
-          exercise_id: we.exercise_id,
-          custom_exercise_id: null,
-          date: workout.workout_date,
-          weight: input.weight,
-          reps: input.reps,
-          volume: calcVolume(input.weight, input.reps),
-          one_rm_estimate: calcOneRM(input.weight, input.reps),
-        });
+        await this.statsRepo.recalculateExerciseSnapshot(userId, we.exercise_id, workout.workout_date);
       }
     }
 
@@ -130,6 +141,9 @@ export class WorkoutService {
   }
 
   async updateSet(setId: number, userId: number, input: Partial<SetInput>): Promise<Set> {
+    const setContext = await this.repo.getSetContext(setId, userId);
+    if (!setContext) throw new Error("Not found");
+
     const set = await this.repo.updateSet(setId, userId, {
       weight: input.weight,
       reps: input.reps,
@@ -138,11 +152,31 @@ export class WorkoutService {
       completed: input.completed,
     });
     if (!set) throw new Error("Not found");
+
+    if (setContext.exercise_id) {
+      await this.statsRepo.recalculateExerciseSnapshot(
+        userId,
+        setContext.exercise_id,
+        setContext.workout_date
+      );
+    }
+
     return set;
   }
 
   async deleteSet(setId: number, userId: number): Promise<void> {
+    const setContext = await this.repo.getSetContext(setId, userId);
+    if (!setContext) throw new Error("Not found");
+
     const deleted = await this.repo.deleteSet(setId, userId);
     if (!deleted) throw new Error("Not found");
+
+    if (setContext.exercise_id) {
+      await this.statsRepo.recalculateExerciseSnapshot(
+        userId,
+        setContext.exercise_id,
+        setContext.workout_date
+      );
+    }
   }
 }

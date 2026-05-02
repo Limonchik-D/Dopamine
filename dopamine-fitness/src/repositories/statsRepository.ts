@@ -4,6 +4,65 @@ import type { StatsSummary } from "../services/statsService.js";
 export class StatsRepository {
   constructor(private db: D1Database) {}
 
+  async recalculateExerciseSnapshot(userId: number, exerciseId: number, date: string): Promise<void> {
+    const aggregate = await this.db
+      .prepare(
+        `SELECT
+           COUNT(s.id)                                                        AS completed_sets,
+           MAX(CASE WHEN s.weight IS NOT NULL THEN s.weight END)              AS max_weight,
+           MAX(CASE WHEN s.reps IS NOT NULL THEN s.reps END)                  AS max_reps,
+           COALESCE(SUM(CASE
+             WHEN s.weight IS NOT NULL AND s.reps IS NOT NULL
+             THEN s.weight * s.reps
+             ELSE 0
+           END), 0)                                                           AS total_volume,
+           MAX(CASE
+             WHEN s.weight IS NOT NULL AND s.reps IS NOT NULL AND s.reps > 0
+             THEN ROUND(s.weight * (1 + s.reps / 30.0))
+             ELSE NULL
+           END)                                                               AS one_rm_estimate
+         FROM sets s
+         JOIN workout_exercises we ON we.id = s.workout_exercise_id
+         JOIN workouts w ON w.id = we.workout_id
+         WHERE w.user_id = ?1
+           AND w.deleted_at IS NULL
+           AND w.workout_date = ?2
+           AND we.exercise_id = ?3
+           AND s.completed = 1`
+      )
+      .bind(userId, date, exerciseId)
+      .first<{
+        completed_sets: number | null;
+        max_weight: number | null;
+        max_reps: number | null;
+        total_volume: number | null;
+        one_rm_estimate: number | null;
+      }>();
+
+    const completedSets = aggregate?.completed_sets ?? 0;
+    if (completedSets <= 0) {
+      await this.db
+        .prepare(
+          `DELETE FROM progress_snapshots
+           WHERE user_id = ?1 AND exercise_id = ?2 AND date = ?3`
+        )
+        .bind(userId, exerciseId, date)
+        .run();
+      return;
+    }
+
+    await this.upsertSnapshot({
+      user_id: userId,
+      exercise_id: exerciseId,
+      custom_exercise_id: null,
+      date,
+      weight: aggregate?.max_weight ?? null,
+      reps: aggregate?.max_reps ?? null,
+      volume: aggregate?.total_volume ?? null,
+      one_rm_estimate: aggregate?.one_rm_estimate ?? null,
+    });
+  }
+
   async getStats(
     userId: number,
     from: string,
@@ -51,31 +110,50 @@ export class StatsRepository {
   }
 
   async upsertSnapshot(snap: Omit<ProgressSnapshot, "id">): Promise<void> {
-    const conflictTarget = snap.exercise_id
-      ? "(user_id, exercise_id, date)"
-      : "(user_id, custom_exercise_id, date)";
+    const values = [
+      snap.user_id,
+      snap.exercise_id,
+      snap.custom_exercise_id,
+      snap.date,
+      snap.weight,
+      snap.reps,
+      snap.volume,
+      snap.one_rm_estimate,
+    ];
+
+    if (snap.exercise_id != null) {
+      await this.db
+        .prepare(
+          `INSERT INTO progress_snapshots
+             (user_id, exercise_id, custom_exercise_id, date, weight, reps, volume, one_rm_estimate)
+           VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
+           ON CONFLICT(user_id, exercise_id, date)
+           WHERE exercise_id IS NOT NULL
+           DO UPDATE SET
+             weight = excluded.weight,
+             reps = excluded.reps,
+             volume = excluded.volume,
+             one_rm_estimate = excluded.one_rm_estimate`
+        )
+        .bind(...values)
+        .run();
+      return;
+    }
 
     await this.db
       .prepare(
         `INSERT INTO progress_snapshots
            (user_id, exercise_id, custom_exercise_id, date, weight, reps, volume, one_rm_estimate)
          VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
-         ON CONFLICT${conflictTarget} DO UPDATE SET
+         ON CONFLICT(user_id, custom_exercise_id, date)
+         WHERE custom_exercise_id IS NOT NULL
+         DO UPDATE SET
            weight = excluded.weight,
            reps = excluded.reps,
            volume = excluded.volume,
            one_rm_estimate = excluded.one_rm_estimate`
       )
-      .bind(
-        snap.user_id,
-        snap.exercise_id,
-        snap.custom_exercise_id,
-        snap.date,
-        snap.weight,
-        snap.reps,
-        snap.volume,
-        snap.one_rm_estimate
-      )
+      .bind(...values)
       .run();
   }
 

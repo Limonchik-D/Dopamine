@@ -1,4 +1,4 @@
-﻿import { lazy, Suspense, useState } from "react";
+﻿import { lazy, Suspense, useEffect, useState } from "react";
 import { useBodyMetrics, useAddBodyMetric } from "../features/auth/useAuth";
 import { useWorkouts } from "../features/workouts/useWorkouts";
 import {
@@ -19,14 +19,28 @@ const ProgressChart = lazy(() =>
   import("../components/charts/ProgressChart").then((m) => ({ default: m.ProgressChart }))
 );
 
-type Metric = "volume" | "max_weight" | "total_reps" | "workout_count";
+type WorkoutMetric = "volume" | "max_weight" | "total_reps" | "workout_count";
+type ExerciseMetric = "volume" | "max_weight" | "total_reps" | "one_rm_estimate";
+type Metric = WorkoutMetric | ExerciseMetric;
 type ChartPoint = { date: string; value: number };
 
+const WORKOUT_METRICS: WorkoutMetric[] = ["max_weight", "total_reps", "workout_count", "volume"];
+const EXERCISE_METRICS: ExerciseMetric[] = ["max_weight", "total_reps", "volume", "one_rm_estimate"];
+
 const METRIC_LABELS: Record<Metric, string> = {
-  volume: "Объём (кг×повт)",
-  max_weight: "Макс. вес (кг)",
-  total_reps: "Всего повторений",
+  max_weight: "Лучший вес (кг)",
+  total_reps: "Повторения",
   workout_count: "Тренировок",
+  volume: "Тоннаж (кг×повт)",
+  one_rm_estimate: "1ПМ (оценка)",
+};
+
+const METRIC_HINTS: Record<Metric, string> = {
+  max_weight: "Показывает лучший рабочий вес за каждый день выбранного периода.",
+  total_reps: "Показывает суммарное число повторений за день.",
+  workout_count: "Показывает, сколько тренировок было в день.",
+  volume: "Показывает тоннаж: вес × повторы. Полезно как доп. метрика нагрузки.",
+  one_rm_estimate: "Оценка разового максимума (1ПМ) по рабочим подходам.",
 };
 
 const PERIOD_LABELS: Record<StatsPeriod, string> = {
@@ -79,22 +93,37 @@ export function ReportPage() {
 
   const { data: summary, isLoading: summaryLoading } = useStatsSummary();
   const [period, setPeriod] = useState<StatsPeriod>("month");
-  const [metric, setMetric] = useState<Metric>("volume");
+  const [metric, setMetric] = useState<Metric>("max_weight");
+  const [showExtraCharts, setShowExtraCharts] = useState(false);
   const [exerciseId, setExerciseId] = useState<number | null>(null);
   const [exSearch, setExSearch] = useState("");
 
   const { data: workoutData, isLoading: workoutLoading } = useProgress(period);
   const { data: exerciseData, isLoading: exLoading } = useExerciseProgress(exerciseId, period);
   const { data: exercisesData } = useExercises({ search: exSearch, page: 1, limit: 20 });
+  const availableMetrics: Metric[] = exerciseId !== null ? EXERCISE_METRICS : WORKOUT_METRICS;
+
+  useEffect(() => {
+    if (!availableMetrics.includes(metric)) {
+      setMetric("max_weight");
+    }
+  }, [metric, availableMetrics]);
 
   const isChartLoading = workoutLoading || (exerciseId !== null && exLoading);
   const chartPoints: ChartPoint[] =
     exerciseId !== null
       ? mapExercisePoints(
           exerciseData?.points ?? [],
-          metric === "max_weight" ? "weight" : metric === "volume" ? "volume" : metric === "total_reps" ? "reps" : "one_rm_estimate"
+          metric === "max_weight"
+            ? "weight"
+            : metric === "volume"
+              ? "volume"
+              : metric === "total_reps"
+                ? "reps"
+                : "one_rm_estimate"
         )
-      : mapWorkoutPoints(workoutData?.points ?? [], metric);
+      : mapWorkoutPoints(workoutData?.points ?? [], metric as WorkoutMetric);
+  const metricHint = METRIC_HINTS[metric];
 
   const lastWeight = metrics.find((m) => m.weight_kg)?.weight_kg;
   const lastHeight = metrics.find((m) => m.height_cm)?.height_cm;
@@ -165,7 +194,6 @@ export function ReportPage() {
           <>
             <StatCard label="Тренировок всего" value={summary?.total_workouts ?? 0} />
             <StatCard label="Завершено" value={completed.length} accent="#84cc16" />
-            <StatCard label="Объём, кг×повт" value={summary ? Math.round(summary.total_volume).toLocaleString("ru-RU") : 0} />
             <StatCard label="Подходов" value={summary?.total_sets ?? 0} />
             <StatCard label="Рекорд, кг" value={summary?.max_weight ?? 0} accent="#84cc16" />
             <StatCard label="Активных дней" value={summary?.active_days ?? 0} />
@@ -174,8 +202,13 @@ export function ReportPage() {
           </>
         )}
       </div>
+      {!summaryLoading && (
+        <p className="text-muted" style={{ marginTop: "var(--space-xs)", fontSize: "0.85rem" }}>
+          Дополнительно: тоннаж за всё время — {summary ? Math.round(summary.total_volume).toLocaleString("ru-RU") : 0} кг×повт.
+        </p>
+      )}
 
-      <SectionTitle>📉 График прогресса</SectionTitle>
+      <SectionTitle>📉 Прогресс без лишнего</SectionTitle>
       <div className="rep-card">
         <div className="rep-switcher-row">
           {(Object.keys(PERIOD_LABELS) as StatsPeriod[]).map((p) => (
@@ -185,12 +218,15 @@ export function ReportPage() {
           ))}
         </div>
         <div className="rep-switcher-row" style={{ marginTop: "0.5rem" }}>
-          {(Object.keys(METRIC_LABELS) as Metric[]).map((m) => (
+          {availableMetrics.map((m) => (
             <button key={m} className={`rep-seg-btn${metric === m ? " is-active" : ""}`} onClick={() => setMetric(m)}>
               {METRIC_LABELS[m]}
             </button>
           ))}
         </div>
+        <p className="text-muted" style={{ marginTop: "0.5rem", marginBottom: 0, fontSize: "0.85rem" }}>
+          {metricHint}
+        </p>
         <div className="rep-ex-filter">
           <span className="rep-ex-label">Упражнение:</span>
           <input
@@ -232,17 +268,27 @@ export function ReportPage() {
 
       {weeklyData.length > 0 && (
         <>
-          <SectionTitle>📅 Тренировки по неделям</SectionTitle>
+          <SectionTitle>📅 Дополнительный график</SectionTitle>
           <div className="rep-card">
-            <ResponsiveContainer width="100%" height={180}>
-              <BarChart data={weeklyData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                <XAxis dataKey="week" tick={{ fontSize: 11, fill: "#888" }} />
-                <YAxis tick={{ fontSize: 11, fill: "#888" }} allowDecimals={false} />
-                <Tooltip {...tooltipStyle} />
-                <Bar dataKey="count" name="Тренировок" fill="#84cc16" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="row" style={{ justifyContent: "space-between", alignItems: "center", marginBottom: showExtraCharts ? "var(--space-sm)" : 0, gap: "var(--space-sm)", flexWrap: "wrap" }}>
+              <p className="text-muted" style={{ margin: 0 }}>
+                По умолчанию скрыто, чтобы не перегружать отчёт.
+              </p>
+              <button className="rep-seg-btn" onClick={() => setShowExtraCharts((prev) => !prev)}>
+                {showExtraCharts ? "Скрыть" : "Показать"}
+              </button>
+            </div>
+            {showExtraCharts && (
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={weeklyData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                  <XAxis dataKey="week" tick={{ fontSize: 11, fill: "#888" }} />
+                  <YAxis tick={{ fontSize: 11, fill: "#888" }} allowDecimals={false} />
+                  <Tooltip {...tooltipStyle} />
+                  <Bar dataKey="count" name="Тренировок" fill="#84cc16" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </>
       )}

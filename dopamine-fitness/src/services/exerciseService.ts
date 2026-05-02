@@ -196,4 +196,29 @@ export class ExerciseService {
     const remaining = await this.repo.countUntranslated();
     return { translated: results.filter((r) => r.name_ru !== null).length, remaining };
   }
+
+  /**
+   * Background backfill for list endpoint:
+   * translates a small chunk of currently visible exercises that still have no Russian name.
+   */
+  async backfillVisibleTranslations(exercises: ExerciseCatalog[], maxItems = 6): Promise<void> {
+    const missing = exercises
+      .filter((exercise) => !exercise.name_ru || exercise.name_ru.trim() === "")
+      .slice(0, maxItems)
+      .map((exercise) => ({
+        id: exercise.id,
+        name_en: exercise.name_en,
+        instructions_en: exercise.instructions_en,
+      }));
+
+    if (missing.length === 0) return;
+
+    const translator = new TranslationService(this.env.KV);
+    const translated = await translator.translateBatch(missing);
+
+    for (const item of translated) {
+      if (!item.name_ru && !item.instructions_ru) continue;
+      await this.repo.updateTranslation(item.id, item.name_ru, item.instructions_ru);
+    }
+  }
 }

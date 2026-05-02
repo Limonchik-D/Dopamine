@@ -1,6 +1,11 @@
 ﻿import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../services/apiClient";
 
+function invalidateProgressAndSummary(queryClient: ReturnType<typeof useQueryClient>) {
+  queryClient.invalidateQueries({ queryKey: ["progress"] });
+  queryClient.invalidateQueries({ queryKey: ["stats"] });
+}
+
 export type Workout = {
   id: number;
   name: string;
@@ -33,13 +38,20 @@ export type WorkoutExerciseEntry = {
   // Joined fields from exercise_catalog
   exercise_name?: string | null;
   exercise_gif_url?: string | null;
+  exercise_image_url?: string | null;
+  exercise_instructions_en?: string | null;
+  exercise_instructions_ru?: string | null;
   exercise_target?: string | null;
   exercise_equipment?: string | null;
   // Joined fields from custom_exercises
   custom_name?: string | null;
   custom_photo_key?: string | null;
+  custom_description?: string | null;
   custom_target?: string | null;
   custom_equipment?: string | null;
+  // Suggested values from previous completed workout
+  last_weight?: number | null;
+  last_reps?: number | null;
   sets: WorkoutSet[];
 };
 
@@ -66,6 +78,26 @@ export function useCreateWorkout() {
       apiClient.post<Workout>("/workouts", payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workouts"] });
+      invalidateProgressAndSummary(queryClient);
+    },
+  });
+}
+
+export function useDuplicateWorkout() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      workout_date,
+      name,
+    }: {
+      id: number;
+      workout_date?: string;
+      name?: string;
+    }) => apiClient.post<Workout>(`/workouts/${id}/duplicate`, { workout_date, name }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workouts"] });
+      invalidateProgressAndSummary(queryClient);
     },
   });
 }
@@ -76,6 +108,7 @@ export function useDeleteWorkout() {
     mutationFn: (id: number) => apiClient.delete<unknown>(`/workouts/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workouts"] });
+      invalidateProgressAndSummary(queryClient);
     },
   });
 }
@@ -87,6 +120,7 @@ export function useAddExerciseToWorkout(workoutId: number) {
       apiClient.post<WorkoutExerciseEntry>(`/workouts/${workoutId}/exercises`, { order_index: 0, ...payload }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workout", String(workoutId)] });
+      invalidateProgressAndSummary(queryClient);
     },
   });
 }
@@ -97,6 +131,7 @@ export function useRemoveExerciseFromWorkout(workoutId: number) {
     mutationFn: (weId: number) => apiClient.delete<unknown>(`/workouts/exercises/${weId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workout", String(workoutId)] });
+      invalidateProgressAndSummary(queryClient);
     },
   });
 }
@@ -108,6 +143,7 @@ export function useAddSet(workoutId: number, weId: number) {
       apiClient.post<WorkoutSet>(`/workouts/exercises/${weId}/sets`, { completed: false, ...payload }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workout", String(workoutId)] });
+      invalidateProgressAndSummary(queryClient);
     },
   });
 }
@@ -119,6 +155,7 @@ export function useUpdateSet(workoutId: number, weId: number) {
       apiClient.patch<WorkoutSet>(`/workouts/exercises/${weId}/sets/${setId}`, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workout", String(workoutId)] });
+      invalidateProgressAndSummary(queryClient);
     },
   });
 }
@@ -129,6 +166,7 @@ export function useDeleteSet(workoutId: number, weId: number) {
     mutationFn: (setId: number) => apiClient.delete<unknown>(`/workouts/exercises/${weId}/sets/${setId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workout", String(workoutId)] });
+      invalidateProgressAndSummary(queryClient);
     },
   });
 }
@@ -141,6 +179,7 @@ export function useCompleteWorkout(workoutId: number) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workout", String(workoutId)] });
       queryClient.invalidateQueries({ queryKey: ["workouts"] });
+      invalidateProgressAndSummary(queryClient);
     },
   });
 }

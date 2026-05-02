@@ -4,9 +4,9 @@
   "description": "Fitness workout tracking app on Cloudflare Workers",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "wrangler dev --local --persist",
+    "dev": "wrangler dev --local --persist-to .wrangler/state",
     "dev:web": "npm --prefix ./web run dev",
-    "dev:all": "concurrently -n \"workers,vite\" -c \"cyan,green\" \"wrangler dev --local --persist\" \"npm --prefix ./web run dev\"",
+    "dev:all": "concurrently -n \"workers,vite\" -c \"cyan,green\" \"wrangler dev --local --persist-to .wrangler/state\" \"npm --prefix ./web run dev\"",
     "web:install": "npm --prefix ./web install",
     "web:type-check": "npm --prefix ./web run type-check",
     "web:build": "npm --prefix ./web run build",

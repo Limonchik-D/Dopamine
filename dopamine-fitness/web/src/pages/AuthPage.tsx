@@ -88,7 +88,7 @@ export function AuthPage() {
   return (
     <Card>
       <h2>{isRegister ? "Регистрация" : "Вход"}</h2>
-      <form onSubmit={onSubmit} className="stack">
+      <form onSubmit={onSubmit} className="stack auth-form">
         <input
           type="email"
           autoComplete="email"
@@ -104,7 +104,8 @@ export function AuthPage() {
             placeholder="Username"
             minLength={3}
             maxLength={32}
-            pattern="[a-zA-Z0-9_-]+"
+            inputMode="text"
+            title="Только латиница, цифры, _ и -"
             required
           />
         )}
@@ -142,13 +143,17 @@ export function AuthPage() {
             </div>
           </div>
         )}
-        <Button type="submit" disabled={Boolean(validationError) || login.isPending || register.isPending}>
+        <Button
+          type="submit"
+          className="auth-action-btn"
+          disabled={Boolean(validationError) || login.isPending || register.isPending}
+        >
           {isRegister ? "Создать аккаунт" : "Войти"}
         </Button>
-        <Button type="button" onClick={onGoogleLogin}>Войти через Google</Button>
+        <Button type="button" className="auth-action-btn" onClick={onGoogleLogin}>Войти через Google</Button>
         {errorText && <p className="error-text">{errorText}</p>}
       </form>
-      <Button type="button" onClick={() => setIsRegister((x) => !x)}>
+      <Button type="button" className="auth-toggle-btn" onClick={() => setIsRegister((x) => !x)}>
         {isRegister ? "У меня уже есть аккаунт" : "Создать аккаунт"}
       </Button>
     </Card>

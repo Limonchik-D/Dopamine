@@ -42,6 +42,22 @@ workoutRoutes.get("/:id", async (c) => {
   return c.json({ success: true, data: { ...workout, exercises } });
 });
 
+// Дублировать тренировку на новую дату (по умолчанию сегодня)
+workoutRoutes.post("/:id/duplicate", async (c) => {
+  const userId = c.get("userId") as number;
+  const id = parseInt(c.req.param("id"), 10);
+  const body = await c.req.json().catch(() => ({})) as {
+    workout_date?: string;
+    name?: string;
+  };
+
+  const date = body.workout_date ?? new Date().toISOString().slice(0, 10);
+  const service = new WorkoutService(c.env.DB);
+  const duplicated = await service.duplicateWorkout(id, userId, date, body.name);
+  await invalidateStatsCache(c.env, userId);
+  return c.json({ success: true, data: duplicated }, 201);
+});
+
 workoutRoutes.patch("/:id", async (c) => {
   const userId = c.get("userId") as number;
   const id = parseInt(c.req.param("id"), 10);

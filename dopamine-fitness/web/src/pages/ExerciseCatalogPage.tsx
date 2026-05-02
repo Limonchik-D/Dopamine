@@ -221,7 +221,7 @@ export function ExerciseCatalogPage() {
           <input
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Поиск на английском (напр. bench press, squat…)"
+            placeholder="Поиск (рус/eng): жим лежа / bench press"
             style={{ marginTop: "var(--space-sm)" }}
           />
           {total > 0 && (

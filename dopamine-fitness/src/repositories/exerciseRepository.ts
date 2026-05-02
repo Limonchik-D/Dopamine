@@ -1,6 +1,103 @@
 import type { ExerciseCatalog } from "../types/index.js";
 import type { ExerciseFilterInput } from "../validators/schemas.js";
 
+type SearchAlias = {
+  needle: string;
+  expansions: string[];
+};
+
+const PHRASE_ALIASES: SearchAlias[] = [
+  { needle: "жим лежа", expansions: ["bench press", "chest press", "barbell bench press", "dumbbell bench press"] },
+  { needle: "жим стоя", expansions: ["overhead press", "shoulder press"] },
+  { needle: "становая тяга", expansions: ["deadlift", "romanian deadlift"] },
+  { needle: "румынская тяга", expansions: ["romanian deadlift", "rdl"] },
+  { needle: "тяга горизонтального блока", expansions: ["seated cable row", "cable row"] },
+  { needle: "тяга верхнего блока", expansions: ["lat pulldown"] },
+  { needle: "тяга штанги", expansions: ["barbell row", "bent over row"] },
+  { needle: "жим ногами", expansions: ["leg press"] },
+  { needle: "сгибание ног", expansions: ["leg curl", "hamstring curl"] },
+  { needle: "разгибание ног", expansions: ["leg extension"] },
+  { needle: "ягодичный мост", expansions: ["hip thrust", "glute bridge"] },
+  { needle: "тяга к лицу", expansions: ["face pull"] },
+  { needle: "жим гантелей", expansions: ["dumbbell press", "incline dumbbell press"] },
+  { needle: "разведение гантелей", expansions: ["lateral raise", "dumbbell fly"] },
+  { needle: "скручивания", expansions: ["crunch", "ab crunch"] },
+  { needle: "планка", expansions: ["plank"] },
+  { needle: "выпады", expansions: ["lunge", "walking lunge"] },
+  { needle: "отжимания на брусьях", expansions: ["dips", "parallel bar dips"] },
+  { needle: "подтягивания", expansions: ["pull up", "chin up"] },
+  { needle: "отжимания", expansions: ["push up"] },
+];
+
+const TOKEN_ALIASES: Record<string, string[]> = {
+  жим: ["press", "bench", "chest press", "shoulder press"],
+  лежа: ["bench"],
+  стоя: ["standing"],
+  тяга: ["row", "pull", "deadlift"],
+  присед: ["squat", "front squat", "back squat"],
+  выпады: ["lunge", "walking lunge"],
+  бицепс: ["biceps", "curl"],
+  трицепс: ["triceps", "extension", "pushdown"],
+  трицепса: ["triceps", "extension", "pushdown"],
+  плечи: ["shoulder", "deltoid"],
+  плечо: ["shoulder", "deltoid"],
+  дельты: ["deltoid", "shoulder", "lateral raise"],
+  грудь: ["chest", "pec"],
+  грудные: ["chest", "pec"],
+  спина: ["back", "lat"],
+  широчайшие: ["lats", "lat"],
+  пресс: ["abs", "core", "abdominal", "crunch", "plank"],
+  ноги: ["legs", "quads", "hamstrings", "calves"],
+  ягодицы: ["glute", "glutes", "hip thrust"],
+  ягодиц: ["glute", "glutes", "hip thrust"],
+  икры: ["calf", "calves"],
+  подтягивания: ["pull up", "chin up"],
+  отжимания: ["push up", "dips"],
+  брусья: ["dip", "dips"],
+  планка: ["plank"],
+};
+
+function normalizeSearch(value: string): string {
+  return value.toLowerCase().replace(/ё/g, "е").replace(/\s+/g, " ").trim();
+}
+
+function withCapitalizedFirst(term: string): string {
+  if (!term) return term;
+  return term.charAt(0).toUpperCase() + term.slice(1);
+}
+
+function expandSearchTerms(rawSearch: string): string[] {
+  const normalized = normalizeSearch(rawSearch);
+  if (!normalized) return [];
+
+  const terms = new Set<string>();
+  terms.add(normalized);
+  const capitalizedNormalized = withCapitalizedFirst(normalized);
+  if (capitalizedNormalized !== normalized) terms.add(capitalizedNormalized);
+
+  for (const alias of PHRASE_ALIASES) {
+    if (normalized.includes(alias.needle)) {
+      for (const expansion of alias.expansions) {
+        terms.add(expansion);
+        const capitalized = withCapitalizedFirst(expansion);
+        if (capitalized !== expansion) terms.add(capitalized);
+      }
+    }
+  }
+
+  for (const token of normalized.split(" ")) {
+    const expansions = TOKEN_ALIASES[token];
+    if (!expansions) continue;
+    for (const expansion of expansions) {
+      terms.add(expansion);
+      const capitalized = withCapitalizedFirst(expansion);
+      if (capitalized !== expansion) terms.add(capitalized);
+    }
+  }
+
+  return Array.from(terms).filter((term) => term.length >= 2).slice(0, 24);
+}
+
 export class ExerciseRepository {
   constructor(private db: D1Database) {}
 
@@ -8,11 +105,28 @@ export class ExerciseRepository {
     const conditions: string[] = [];
     const values: unknown[] = [];
     let i = 1;
+    const primarySearchPlaceholders: string[] = [];
 
     if (filters.search) {
-      conditions.push(`(name_en LIKE ?${i} OR name_ru LIKE ?${i})`);
-      values.push(`%${filters.search}%`);
-      i++;
+      const searchTerms = expandSearchTerms(filters.search);
+      const searchClauses: string[] = [];
+
+      for (const term of searchTerms) {
+        const placeholder = `?${i++}`;
+        if (primarySearchPlaceholders.length < 2) primarySearchPlaceholders.push(placeholder);
+        values.push(`%${term}%`);
+        searchClauses.push(
+          `(LOWER(name_en) LIKE ${placeholder}
+            OR LOWER(REPLACE(COALESCE(name_ru, ''), 'ё', 'е')) LIKE ${placeholder}
+            OR LOWER(REPLACE(COALESCE(target, ''), 'ё', 'е')) LIKE ${placeholder}
+            OR LOWER(REPLACE(COALESCE(equipment, ''), 'ё', 'е')) LIKE ${placeholder}
+            OR LOWER(REPLACE(COALESCE(body_part, ''), 'ё', 'е')) LIKE ${placeholder})`
+        );
+      }
+
+      if (searchClauses.length > 0) {
+        conditions.push(`(${searchClauses.join(" OR ")})`);
+      }
     }
     if (filters.target) {
       conditions.push(`target = ?${i++}`);
@@ -32,12 +146,27 @@ export class ExerciseRepository {
     }
 
     const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+    const primaryCondition = primarySearchPlaceholders.length > 0
+      ? primarySearchPlaceholders
+          .map((placeholder) => `LOWER(REPLACE(COALESCE(name_ru, ''), 'ё', 'е')) LIKE ${placeholder}`)
+          .join(" OR ")
+      : null;
+
+    const orderBy = primaryCondition
+      ? `CASE
+           WHEN (${primaryCondition}) THEN 0
+           WHEN LOWER(name_en) LIKE ${primarySearchPlaceholders[0]} THEN 1
+           WHEN LOWER(REPLACE(COALESCE(target, ''), 'ё', 'е')) LIKE ${primarySearchPlaceholders[0]} THEN 2
+           WHEN LOWER(REPLACE(COALESCE(equipment, ''), 'ё', 'е')) LIKE ${primarySearchPlaceholders[0]} THEN 3
+           ELSE 9
+         END, name_en`
+      : "name_en";
     const limit = filters.limit;
     const offset = (filters.page - 1) * limit;
 
     const [rows, countRow] = await Promise.all([
       this.db
-        .prepare(`SELECT * FROM exercise_catalog ${where} ORDER BY name_en LIMIT ?${i} OFFSET ?${i + 1}`)
+        .prepare(`SELECT * FROM exercise_catalog ${where} ORDER BY ${orderBy} LIMIT ?${i} OFFSET ?${i + 1}`)
         .bind(...values, limit, offset)
         .all<ExerciseCatalog>(),
       this.db
@@ -133,7 +262,9 @@ export class ExerciseRepository {
     await this.db
       .prepare(
         `UPDATE exercise_catalog
-         SET name_ru = ?1, instructions_ru = ?2
+         SET
+           name_ru = COALESCE(?1, name_ru),
+           instructions_ru = COALESCE(?2, instructions_ru)
          WHERE id = ?3`
       )
       .bind(name_ru, instructions_ru, id)

@@ -121,28 +121,105 @@ export class WorkoutRepository {
     return row;
   }
 
-  async getExercises(workoutId: number): Promise<WorkoutExercise[]> {
+  async copyWorkoutExercisesAndSets(
+    sourceWorkoutId: number,
+    targetWorkoutId: number,
+    userId: number
+  ): Promise<void> {
+    const sourceExercises = await this.db
+      .prepare(
+        `SELECT we.*
+         FROM workout_exercises we
+         JOIN workouts w ON w.id = we.workout_id
+         WHERE we.workout_id = ?1 AND w.user_id = ?2 AND w.deleted_at IS NULL
+         ORDER BY we.order_index ASC`
+      )
+      .bind(sourceWorkoutId, userId)
+      .all<WorkoutExercise>();
+
+    for (const sourceExercise of sourceExercises.results) {
+      const insertedExercise = await this.addExercise(
+        targetWorkoutId,
+        sourceExercise.exercise_id,
+        sourceExercise.custom_exercise_id,
+        sourceExercise.order_index,
+        sourceExercise.target_muscle,
+        sourceExercise.equipment
+      );
+
+      const sourceSets = await this.getSets(sourceExercise.id);
+      for (const sourceSet of sourceSets) {
+        await this.addSet(
+          insertedExercise.id,
+          sourceSet.set_number,
+          sourceSet.weight,
+          sourceSet.reps,
+          sourceSet.rest_seconds,
+          sourceSet.rir,
+          false
+        );
+      }
+    }
+  }
+
+  async getExercises(workoutId: number, userId: number): Promise<WorkoutExercise[]> {
     const rows = await this.db
       .prepare(
         `SELECT
            we.*,
            COALESCE(ec.name_ru, ec.name_en)  AS exercise_name,
            ec.gif_url                         AS exercise_gif_url,
+           ec.image_url                       AS exercise_image_url,
+           ec.instructions_en                 AS exercise_instructions_en,
+           ec.instructions_ru                 AS exercise_instructions_ru,
            ec.target                          AS exercise_target,
            ec.equipment                       AS exercise_equipment,
            NULL                               AS exercise_photo_key,
            0                                  AS is_custom,
            cx.name                            AS custom_name,
            cx.photo_r2_key                    AS custom_photo_key,
+           cx.description                     AS custom_description,
            cx.target                          AS custom_target,
-           cx.equipment                       AS custom_equipment
+           cx.equipment                       AS custom_equipment,
+           (
+             SELECT s2.weight
+             FROM sets s2
+             JOIN workout_exercises we2 ON we2.id = s2.workout_exercise_id
+             JOIN workouts w2 ON w2.id = we2.workout_id
+             WHERE w2.user_id = ?2
+               AND w2.deleted_at IS NULL
+               AND w2.id != we.workout_id
+               AND s2.completed = 1
+               AND (
+                 (we.exercise_id IS NOT NULL AND we2.exercise_id = we.exercise_id)
+                 OR (we.custom_exercise_id IS NOT NULL AND we2.custom_exercise_id = we.custom_exercise_id)
+               )
+             ORDER BY w2.workout_date DESC, w2.created_at DESC, s2.id DESC
+             LIMIT 1
+           )                                  AS last_weight,
+           (
+             SELECT s2.reps
+             FROM sets s2
+             JOIN workout_exercises we2 ON we2.id = s2.workout_exercise_id
+             JOIN workouts w2 ON w2.id = we2.workout_id
+             WHERE w2.user_id = ?2
+               AND w2.deleted_at IS NULL
+               AND w2.id != we.workout_id
+               AND s2.completed = 1
+               AND (
+                 (we.exercise_id IS NOT NULL AND we2.exercise_id = we.exercise_id)
+                 OR (we.custom_exercise_id IS NOT NULL AND we2.custom_exercise_id = we.custom_exercise_id)
+               )
+             ORDER BY w2.workout_date DESC, w2.created_at DESC, s2.id DESC
+             LIMIT 1
+           )                                  AS last_reps
          FROM workout_exercises we
          LEFT JOIN exercise_catalog ec ON ec.id = we.exercise_id
          LEFT JOIN custom_exercises cx ON cx.id = we.custom_exercise_id
          WHERE we.workout_id = ?1
          ORDER BY we.order_index ASC`
       )
-      .bind(workoutId)
+      .bind(workoutId, userId)
       .all<WorkoutExercise>();
     return rows.results;
   }
@@ -159,6 +236,29 @@ export class WorkoutRepository {
       )
       .bind(id, userId)
       .first<WorkoutExercise>();
+    return row ?? null;
+  }
+
+  async getSetContext(
+    setId: number,
+    userId: number
+  ): Promise<{ set_id: number; workout_exercise_id: number; exercise_id: number | null; workout_date: string } | null> {
+    const row = await this.db
+      .prepare(
+        `SELECT
+           s.id                 AS set_id,
+           s.workout_exercise_id,
+           we.exercise_id,
+           w.workout_date
+         FROM sets s
+         JOIN workout_exercises we ON we.id = s.workout_exercise_id
+         JOIN workouts w ON w.id = we.workout_id
+         WHERE s.id = ?1
+           AND w.user_id = ?2
+           AND w.deleted_at IS NULL`
+      )
+      .bind(setId, userId)
+      .first<{ set_id: number; workout_exercise_id: number; exercise_id: number | null; workout_date: string }>();
     return row ?? null;
   }
 
@@ -284,8 +384,8 @@ export class WorkoutRepository {
     return (result.meta.changes ?? 0) > 0;
   }
 
-  async getExercisesWithSets(workoutId: number): Promise<(WorkoutExercise & { sets: Set[] })[]> {
-    const exercises = await this.getExercises(workoutId);
+  async getExercisesWithSets(workoutId: number, userId: number): Promise<(WorkoutExercise & { sets: Set[] })[]> {
+    const exercises = await this.getExercises(workoutId, userId);
     if (exercises.length === 0) return [];
 
     const ids = exercises.map((e) => e.id);
