@@ -58,74 +58,73 @@ export class ExerciseService {
     return result;
   }
 
+  async isCatalogEmpty(): Promise<boolean> {
+    const { total } = await this.repo.findMany({ page: 1, limit: 1 });
+    return total === 0;
+  }
+
   // ─── Sync from ExerciseDB (called manually or via cron) ──────────────────
 
-  async syncFromExternalAPIs(): Promise<{ synced: number; source: string }> {
+  async syncFromExternalAPIs(force = false): Promise<{ synced: number; source: string }> {
     const config = getAppConfig(this.env);
-    // Check if already synced recently
-    const alreadySynced = await this.env.KV.get(CATALOG_CACHE_KEY);
-    if (alreadySynced) {
-      return { synced: 0, source: "cache_hit" };
+
+    if (!force) {
+      const alreadySynced = await this.env.KV.get(CATALOG_CACHE_KEY);
+      if (alreadySynced) return { synced: 0, source: "cache_hit" };
     }
 
+    // ── Primary: wger (free, no key needed) ──────────────────────────────────
     try {
-      const client = new ExerciseDBIntegration(
-        config.exercise.exerciseDbBaseUrl,
-        config.exercise.exerciseDbApiKey
-      );
-      const exercises = await client.fetchAll();
+      const wger = new WgerIntegration(config.exercise.wgerBaseUrl);
+      const exercises = await wger.fetchAll();
       let synced = 0;
-
       for (const ex of exercises) {
         await this.repo.upsertFromExternal({
-          source: "exercisedb",
-          source_exercise_id: ex.id,
+          source: "wger",
+          source_exercise_id: String(ex.id),
           name_en: ex.name,
           name_ru: null,
-          target: ex.target,
-          equipment: ex.equipment,
-          body_part: ex.bodyPart,
-          gif_url: ex.gifUrl,
+          target: ex.muscles[0]?.name_en ?? null,
+          equipment: ex.equipment[0]?.name ?? null,
+          body_part: ex.category?.name ?? null,
+          gif_url: null,
           image_url: null,
-          instructions_en: ex.instructions.join(" "),
+          instructions_en: ex.description,
           instructions_ru: null,
         });
         synced++;
       }
+      await this.env.KV.put(CATALOG_CACHE_KEY, "1", { expirationTtl: config.exercise.cacheTtlSeconds });
+      return { synced, source: "wger" };
+    } catch { /* fall through to ExerciseDB */ }
 
-      await this.env.KV.put(CATALOG_CACHE_KEY, "1", {
-        expirationTtl: config.exercise.cacheTtlSeconds,
-      });
-
-      return { synced, source: "exercisedb" };
-    } catch {
-      // Fallback to wger
+    // ── Fallback: ExerciseDB (requires paid API key) ──────────────────────────
+    if (config.exercise.exerciseDbApiKey) {
       try {
-        const wger = new WgerIntegration(config.exercise.wgerBaseUrl);
-        const exercises = await wger.fetchAll();
+        const client = new ExerciseDBIntegration(config.exercise.exerciseDbBaseUrl, config.exercise.exerciseDbApiKey);
+        const exercises = await client.fetchAll();
         let synced = 0;
-
         for (const ex of exercises) {
           await this.repo.upsertFromExternal({
-            source: "wger",
-            source_exercise_id: String(ex.id),
+            source: "exercisedb",
+            source_exercise_id: ex.id,
             name_en: ex.name,
             name_ru: null,
-            target: ex.muscles[0]?.name_en ?? null,
-            equipment: ex.equipment[0]?.name ?? null,
-            body_part: ex.category?.name ?? null,
-            gif_url: null,
+            target: ex.target,
+            equipment: ex.equipment,
+            body_part: ex.bodyPart,
+            gif_url: ex.gifUrl,
             image_url: null,
-            instructions_en: ex.description,
+            instructions_en: ex.instructions.join(" "),
             instructions_ru: null,
           });
           synced++;
         }
-
-        return { synced, source: "wger" };
-      } catch {
-        return { synced: 0, source: "seed_only" };
-      }
+        await this.env.KV.put(CATALOG_CACHE_KEY, "1", { expirationTtl: config.exercise.cacheTtlSeconds });
+        return { synced, source: "exercisedb" };
+      } catch { /* fall through */ }
     }
+
+    return { synced: 0, source: "failed" };
   }
 }

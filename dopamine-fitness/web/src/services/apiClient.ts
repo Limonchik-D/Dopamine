@@ -36,7 +36,24 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     },
   });
 
-  const body = (await response.json()) as ApiEnvelope<T>;
+  // Handle empty body (204 No Content or truly empty error responses)
+  const text = await response.text();
+  if (!text || text.trim() === "") {
+    if (!response.ok) {
+      throw new ApiClientError("Request failed (empty response)", response.status);
+    }
+    return undefined as unknown as T;
+  }
+
+  let body: ApiEnvelope<T>;
+  try {
+    body = JSON.parse(text) as ApiEnvelope<T>;
+  } catch {
+    throw new ApiClientError(
+      `Invalid JSON response: ${text.slice(0, 100)}`,
+      response.status,
+    );
+  }
 
   if (!response.ok || !body.success) {
     throw new ApiClientError(
@@ -48,7 +65,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   }
 
   if (body.data === undefined) {
-    throw new ApiClientError("Response has no data", response.status, "INVALID_RESPONSE", body.requestId);
+    return undefined as unknown as T;
   }
 
   return body.data;

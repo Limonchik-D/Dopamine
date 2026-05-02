@@ -91,7 +91,7 @@ export function getAppConfig(env: Env): AppConfig {
     exercise: {
       cacheTtlSeconds: requirePositiveInt("EXERCISE_CACHE_TTL", env.EXERCISE_CACHE_TTL),
       exerciseDbBaseUrl: requireString("EXERCISEDB_BASE_URL", env.EXERCISEDB_BASE_URL),
-      exerciseDbApiKey: requireString("EXERCISEDB_API_KEY", env.EXERCISEDB_API_KEY),
+      exerciseDbApiKey: env.EXERCISEDB_API_KEY?.trim() ?? "",
       wgerBaseUrl: requireString("WGER_BASE_URL", env.WGER_BASE_URL),
     },
     cache: {

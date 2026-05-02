@@ -17,6 +17,13 @@ exerciseRoutes.get("/", async (c) => {
   const filters = validate(exerciseFilterSchema, Object.fromEntries(url.searchParams));
 
   const service = new ExerciseService(c.env);
+
+  // Auto-sync if catalog is empty
+  const catalogEmpty = await service.isCatalogEmpty();
+  if (catalogEmpty) {
+    c.executionCtx.waitUntil(service.syncFromExternalAPIs());
+  }
+
   const result = await service.list(filters);
   return c.json({ success: true, data: result });
 });
@@ -28,10 +35,11 @@ exerciseRoutes.get("/filters", async (c) => {
   return c.json({ success: true, data: filters });
 });
 
-// GET /exercises/sync — admin: trigger sync from ExerciseDB/wger
+// POST /exercises/sync — admin: trigger sync from ExerciseDB/wger
 exerciseRoutes.post("/sync", requireRole("admin"), async (c) => {
+  const body = await c.req.json().catch(() => ({})) as { force?: boolean };
   const service = new ExerciseService(c.env);
-  const result = await service.syncFromExternalAPIs();
+  const result = await service.syncFromExternalAPIs(body.force ?? false);
   return c.json({ success: true, data: result });
 });
 
