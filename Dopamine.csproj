@@ -4,10 +4,22 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Запрещаем VS компилировать TypeScript своим движком — React/Vite проект управляется отдельно -->
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="dopamine-fitness\.github\workflows\ci-cd.yml" />
+  </ItemGroup>
+
+  <!-- Исключаем node_modules и dist из отслеживания VS -->
+  <ItemGroup>
+    <Content Remove="dopamine-fitness\node_modules\**" />
+    <Content Remove="dopamine-fitness\web\node_modules\**" />
+    <Content Remove="dopamine-fitness\dist\**" />
+    <Content Remove="dopamine-fitness\web\dist\**" />
+    <None Remove="dopamine-fitness\node_modules\**" />
+    <None Remove="dopamine-fitness\web\node_modules\**" />
   </ItemGroup>
 
 </Project>
