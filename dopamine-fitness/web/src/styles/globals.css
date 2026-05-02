@@ -1,4 +1,4 @@
-/* ═══════════════════════════════════════════════════════════════════════════
+﻿/* ═══════════════════════════════════════════════════════════════════════════
    DOPAMINE FITNESS — PREMIUM UI
    Dark fitness theme · Lime accent · Solid cards · Mobile-first
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -1812,4 +1812,134 @@ input::placeholder, textarea::placeholder { color: var(--muted); }
   flex-shrink: 0;
 }
 
+/* ═══════════════════════════════════════════════
+   WORKOUT DETAILS — finish btn
+═══════════════════════════════════════════════ */
+.wd-finish-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #84cc16, #65a30d);
+  color: #000;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: opacity 0.15s, transform 0.1s;
+  box-shadow: 0 4px 20px rgba(132,204,22,0.3);
+}
+.wd-finish-btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+.wd-finish-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+.wd-completed-badge {
+  text-align: center;
+  padding: 14px;
+  background: rgba(132,204,22,0.1);
+  border: 1px solid rgba(132,204,22,0.3);
+  border-radius: var(--radius-lg);
+  color: #84cc16;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* ═══════════════════════════════════════════════
+   AUTH PAGE — body fields
+═══════════════════════════════════════════════ */
+.auth-body-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.auth-body-field { display: flex; flex-direction: column; gap: 5px; }
+.auth-body-label { font-size: 0.78rem; color: var(--text-muted); padding-left: 2px; }
+
+/* ═══════════════════════════════════════════════
+   REPORT PAGE
+═══════════════════════════════════════════════ */
+.rep-header { padding: 4px 0 8px; }
+.rep-title { font-size: 1.5rem; font-weight: 800; margin: 0 0 4px; }
+.rep-sub { color: var(--text-muted); font-size: 0.88rem; margin: 0; }
+
+.rep-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.rep-stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.rep-stat-value { font-size: 1.6rem; font-weight: 800; color: var(--accent); }
+.rep-stat-label { font-size: 0.78rem; color: var(--text-muted); text-align: center; }
+.rep-stat-sub { font-size: 0.72rem; color: var(--text-muted); }
+
+.rep-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rep-card-header { display: flex; align-items: center; justify-content: space-between; }
+.rep-card-title { font-weight: 700; font-size: 0.95rem; }
+.rep-add-btn {
+  background: rgba(132,204,22,0.12);
+  border: 1px solid rgba(132,204,22,0.3);
+  border-radius: 8px;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  cursor: pointer;
+}
+.rep-add-btn:hover { background: rgba(132,204,22,0.22); }
+
+.rep-add-form { padding: 4px 0; }
+.rep-add-row { display: flex; gap: 8px; align-items: center; }
+.rep-add-row .input { flex: 1; }
+.rep-save-btn {
+  padding: 10px 16px;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.rep-save-btn:disabled { opacity: 0.5; }
+
+.rep-metrics-list { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--border); padding-top: 10px; }
+.rep-metric-row { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
+.rep-metric-date { color: var(--text-muted); flex: 1; }
+.rep-metric-val { color: var(--accent); font-weight: 600; }
+
+.rep-workouts-list { display: flex; flex-direction: column; gap: 8px; }
+.rep-workout-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--bg-2);
+  border-radius: var(--radius-md);
+}
+.rep-workout-name { font-weight: 600; font-size: 0.9rem; }
+.rep-workout-date { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+.rep-workout-dur {
+  font-size: 0.8rem;
+  color: var(--accent);
+  background: rgba(132,204,22,0.1);
+  border-radius: 6px;
+  padding: 3px 8px;
+  white-space: nowrap;
+}

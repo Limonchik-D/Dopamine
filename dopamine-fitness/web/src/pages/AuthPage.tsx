@@ -13,6 +13,8 @@ export function AuthPage() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [weightKg, setWeightKg] = useState("");
+  const [heightCm, setHeightCm] = useState("");
   const [errorText, setErrorText] = useState("");
 
   const login = useLogin();
@@ -64,7 +66,11 @@ export function AuthPage() {
 
     try {
       if (isRegister) {
-        await register.mutateAsync({ email: email.trim(), username: username.trim(), password });
+        await register.mutateAsync({
+          email: email.trim(), username: username.trim(), password,
+          weight_kg: weightKg ? parseFloat(weightKg) : undefined,
+          height_cm: heightCm ? parseFloat(heightCm) : undefined,
+        });
       } else {
         await login.mutateAsync({ email: email.trim(), password });
       }
@@ -112,6 +118,30 @@ export function AuthPage() {
           maxLength={128}
           required
         />
+        {isRegister && (
+          <div className="auth-body-row">
+            <div className="auth-body-field">
+              <label className="auth-body-label">Вес (кг)</label>
+              <input
+                className="input"
+                type="number" min="20" max="500" step="0.1"
+                value={weightKg}
+                onChange={(e) => setWeightKg(e.target.value)}
+                placeholder="70"
+              />
+            </div>
+            <div className="auth-body-field">
+              <label className="auth-body-label">Рост (см)</label>
+              <input
+                className="input"
+                type="number" min="100" max="300" step="1"
+                value={heightCm}
+                onChange={(e) => setHeightCm(e.target.value)}
+                placeholder="175"
+              />
+            </div>
+          </div>
+        )}
         <Button type="submit" disabled={Boolean(validationError) || login.isPending || register.isPending}>
           {isRegister ? "Создать аккаунт" : "Войти"}
         </Button>

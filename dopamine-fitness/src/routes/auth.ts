@@ -50,6 +50,17 @@ authRoutes.post("/register", async (c) => {
   );
   const { user, token } = await service.register(input);
 
+  // Сохраняем вес и рост при регистрации
+  if (input.weight_kg || input.height_cm) {
+    await c.env.DB
+      .prepare(`INSERT INTO user_profiles (user_id, weight_kg, height_cm) VALUES (?1, ?2, ?3)
+        ON CONFLICT(user_id) DO UPDATE SET weight_kg = COALESCE(?2, weight_kg), height_cm = COALESCE(?3, height_cm)`)
+      .bind(user.id, input.weight_kg ?? null, input.height_cm ?? null).run();
+    await c.env.DB
+      .prepare("INSERT INTO body_metrics (user_id, weight_kg, height_cm) VALUES (?1, ?2, ?3)")
+      .bind(user.id, input.weight_kg ?? null, input.height_cm ?? null).run();
+  }
+
   return c.json({ success: true, data: { user, token } }, 201);
 });
 

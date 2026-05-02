@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+﻿import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../services/apiClient";
 
 export type Workout = {
@@ -7,6 +7,8 @@ export type Workout = {
   description: string | null;
   workout_date: string;
   notes: string | null;
+  completed_at: string | null;
+  duration_minutes: number | null;
 };
 
 export type WorkoutSet = {
@@ -131,3 +133,14 @@ export function useDeleteSet(workoutId: number, weId: number) {
   });
 }
 
+export function useCompleteWorkout(workoutId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (duration_minutes?: number) =>
+      apiClient.post<unknown>(`/workouts/${workoutId}/complete`, { duration_minutes }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workout", String(workoutId)] });
+      queryClient.invalidateQueries({ queryKey: ["workouts"] });
+    },
+  });
+}

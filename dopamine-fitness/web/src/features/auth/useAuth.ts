@@ -1,10 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+﻿import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../services/apiClient";
 import { clearAuthToken, getAuthToken, setAuthToken } from "../../services/auth";
 import { useUiSettings } from "../settings/useUiSettings";
 
 type LoginPayload = { email: string; password: string };
-type RegisterPayload = { email: string; username: string; password: string };
+type RegisterPayload = { email: string; username: string; password: string; weight_kg?: number; height_cm?: number };
 
 export type MeResponse = {
   id: number;
@@ -89,5 +89,28 @@ export function useLogout() {
   return useMutation({
     mutationFn: () => apiClient.post<{ message: string }>("/auth/logout"),
     onSuccess: () => clearAuthToken(),
+  });
+}
+
+// ─── Body Metrics ─────────────────────────────────────────────────────────────
+export type BodyMetric = { id: number; weight_kg: number | null; height_cm: number | null; measured_at: string };
+
+export function useBodyMetrics() {
+  return useQuery({
+    queryKey: ["body-metrics"],
+    queryFn: () => apiClient.get<BodyMetric[]>("/me/body-metrics"),
+    enabled: !!getAuthToken(),
+  });
+}
+
+export function useAddBodyMetric() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { weight_kg?: number; height_cm?: number }) =>
+      apiClient.post<BodyMetric>("/me/body-metrics", payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["body-metrics"] });
+      queryClient.invalidateQueries({ queryKey: ["me"] });
+    },
   });
 }

@@ -11,6 +11,8 @@ export const registerSchema = z.object({
     .string()
     .min(8, "Минимум 8 символов")
     .max(128, "Слишком длинный пароль"),
+  weight_kg: z.number().positive().max(500).optional(),
+  height_cm: z.number().positive().max(300).optional(),
 });
 
 export const loginSchema = z.object({

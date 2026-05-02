@@ -10,6 +10,7 @@ import {
   useAddSet,
   useUpdateSet,
   useDeleteSet,
+  useCompleteWorkout,
   type WorkoutExerciseEntry,
   type WorkoutSet,
 } from "../features/workouts/useWorkouts";
@@ -367,8 +368,10 @@ export function WorkoutDetailsPage() {
   const navigate = useNavigate();
   const { data, isLoading, error } = useWorkout(id);
   const deleteWorkout = useDeleteWorkout();
+  const completeWorkout = useCompleteWorkout(parseInt(id ?? "0", 10));
   const [showAddExercise, setShowAddExercise] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  const [startTime] = useState(() => Date.now());
 
   const onDelete = async () => {
     if (!data || !confirm(`Удалить тренировку «${data.name}»?`)) return;
@@ -379,6 +382,13 @@ export function WorkoutDetailsPage() {
     } catch (err) {
       setDeleteError(`${toUserMessage(err)}${toDiagnosticSuffix(err)}`);
     }
+  };
+
+  const onComplete = async () => {
+    if (!data || !confirm("Завершить тренировку?")) return;
+    const duration = Math.round((Date.now() - startTime) / 60000);
+    await completeWorkout.mutateAsync(duration > 0 ? duration : undefined);
+    navigate("/workouts");
   };
 
   if (isLoading) return <Card><p className="text-muted">Загрузка…</p></Card>;
@@ -461,6 +471,22 @@ export function WorkoutDetailsPage() {
           <span style={{ fontSize: "1.3rem" }}>+</span>
           Добавить упражнение
         </button>
+      )}
+
+      {/* Finish workout */}
+      {!data.completed_at && exercises.length > 0 && !showAddExercise && (
+        <button
+          className="wd-finish-btn"
+          onClick={onComplete}
+          disabled={completeWorkout.isPending}
+        >
+          {completeWorkout.isPending ? "Сохраняем…" : "✓ Закончить тренировку"}
+        </button>
+      )}
+      {data.completed_at && (
+        <div className="wd-completed-badge">
+          ✅ Тренировка завершена · {new Date(data.completed_at).toLocaleDateString("ru-RU")}
+        </div>
       )}
     </div>
   );

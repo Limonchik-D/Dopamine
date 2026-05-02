@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+п»їimport { Hono } from "hono";
 import type { Env, HonoVariables } from "../types/index.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { WorkoutService } from "../services/workoutService.js";
@@ -58,7 +58,7 @@ workoutRoutes.delete("/:id", async (c) => {
   const service = new WorkoutService(c.env.DB);
   await service.delete(id, userId);
   await invalidateStatsCache(c.env, userId);
-  return c.json({ success: true, message: "Тренировка удалена" });
+  return c.json({ success: true, message: "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ" });
 });
 
 workoutRoutes.post("/:id/exercises", async (c) => {
@@ -97,7 +97,7 @@ workoutRoutes.delete("/exercises/:weId/sets/:setId", async (c) => {
   const service = new WorkoutService(c.env.DB);
   await service.deleteSet(setId, userId);
   await invalidateStatsCache(c.env, userId);
-  return c.json({ success: true, message: "Подход удалён" });
+  return c.json({ success: true, message: "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ" });
 });
 
 workoutRoutes.delete("/exercises/:weId", async (c) => {
@@ -106,5 +106,18 @@ workoutRoutes.delete("/exercises/:weId", async (c) => {
   const service = new WorkoutService(c.env.DB);
   await service.removeExercise(weId, userId);
   await invalidateStatsCache(c.env, userId);
-  return c.json({ success: true, message: "Упражнение удалено" });
+  return c.json({ success: true, message: "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ" });
+});
+
+// Р—Р°РІРµСЂС€РёС‚СЊ С‚СЂРµРЅРёСЂРѕРІРєСѓ
+workoutRoutes.post("/:id/complete", async (c) => {
+  const userId = c.get("userId") as number;
+  const id = parseInt(c.req.param("id"), 10);
+  const body = await c.req.json().catch(() => ({})) as { duration_minutes?: number };
+  await c.env.DB
+    .prepare("UPDATE workouts SET completed_at = datetime('now'), duration_minutes = ?1 WHERE id = ?2 AND user_id = ?3 AND deleted_at IS NULL")
+    .bind(body.duration_minutes ?? null, id, userId)
+    .run();
+  await invalidateStatsCache(c.env, userId);
+  return c.json({ success: true });
 });
