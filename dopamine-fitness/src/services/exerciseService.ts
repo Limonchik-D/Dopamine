@@ -79,17 +79,19 @@ export class ExerciseService {
       const exercises = await wger.fetchAll();
       let synced = 0;
       for (const ex of exercises) {
+        const name = WgerIntegration.getName(ex);
+        const description = WgerIntegration.getDescription(ex);
         await this.repo.upsertFromExternal({
           source: "wger",
           source_exercise_id: String(ex.id),
-          name_en: ex.name,
+          name_en: name,
           name_ru: null,
-          target: ex.muscles[0]?.name_en ?? null,
+          target: ex.muscles[0]?.name_en ?? ex.muscles[0]?.name ?? null,
           equipment: ex.equipment[0]?.name ?? null,
           body_part: ex.category?.name ?? null,
           gif_url: null,
           image_url: null,
-          instructions_en: ex.description,
+          instructions_en: description || null,
           instructions_ru: null,
         });
         synced++;

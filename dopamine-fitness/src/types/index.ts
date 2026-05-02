@@ -246,9 +246,14 @@ export interface ExerciseDBItem {
 export interface WgerExercise {
   id: number;
   uuid: string;
-  name: string;
-  description: string;
-  muscles: { name_en: string }[];
-  equipment: { name: string }[];
-  category: { name: string };
+  category: { id: number; name: string };
+  muscles: { id: number; name_en: string; name: string }[];
+  muscles_secondary: { id: number; name_en: string; name: string }[];
+  equipment: { id: number; name: string }[];
+  translations: {
+    id: number;
+    language: number;
+    name: string;
+    description: string;
+  }[];
 }

@@ -7,7 +7,6 @@ const NAV_ITEMS = [
   { to: "/dashboard", icon: "⊞", label: "Главная" },
   { to: "/workouts", icon: "◈", label: "Тренировки" },
   { to: "/exercises", icon: "◉", label: "Каталог" },
-  { to: "/progress", icon: "╱╲", label: "Прогресс" },
   { to: "/report", icon: "▣", label: "Отчёт" },
   { to: "/calendar", icon: "▦", label: "Календарь" },
   { to: "/my-exercises", icon: "★", label: "Мои упр." },
@@ -36,7 +35,7 @@ const NAV_EMOJI: Record<string, string> = {
 const BOTTOM_NAV = [
   { to: "/dashboard", emoji: "🏠", label: "Главная" },
   { to: "/workouts", emoji: "💪", label: "Трениров." },
-  { to: "/progress", emoji: "📈", label: "Прогресс" },
+  { to: "/exercises", emoji: "📖", label: "Каталог" },
   { to: "/report", emoji: "📊", label: "Отчёт" },
   { to: "/my-exercises", emoji: "⭐", label: "Мои упр." },
 ];

@@ -1943,3 +1943,160 @@ input::placeholder, textarea::placeholder { color: var(--muted); }
   padding: 3px 8px;
   white-space: nowrap;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   REPORT PAGE — полное обновление
+   ═══════════════════════════════════════════════════════════════ */
+
+.rep-section-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--clr-accent, #84cc16);
+  padding: 0.25rem 0;
+  margin-bottom: -0.25rem;
+}
+
+/* Segment switcher buttons */
+.rep-switcher-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.rep-seg-btn {
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+  color: var(--clr-text-muted, #aaa);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.rep-seg-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.rep-seg-btn.is-active {
+  background: rgba(132,204,22,0.18);
+  border-color: rgba(132,204,22,0.5);
+  color: #84cc16;
+}
+
+/* Exercise filter row */
+.rep-ex-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.rep-ex-label { font-size: 0.8rem; color: var(--clr-text-muted, #aaa); white-space: nowrap; }
+.rep-ex-dropdown {
+  list-style: none;
+  padding: 0;
+  margin: 0.25rem 0 0;
+  background: rgba(20,20,40,0.95);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+.rep-ex-option {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.rep-ex-option:hover { background: rgba(255,255,255,0.06); }
+.rep-ex-option.is-selected { color: #84cc16; background: rgba(132,204,22,0.1); }
+
+/* Body current values row */
+.rep-body-cur {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.rep-body-val {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+.rep-body-bmi {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  background: rgba(255,255,255,0.06);
+  border-radius: 999px;
+}
+
+/* Metrics history */
+.rep-metrics-list { margin-top: 1rem; }
+.rep-metrics-list-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--clr-text-muted, #888);
+  margin-bottom: 0.5rem;
+}
+.rep-metric-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  gap: 0.5rem;
+}
+.rep-metric-row:last-child { border-bottom: none; }
+.rep-metric-date { font-size: 0.82rem; color: var(--clr-text-muted, #aaa); }
+.rep-metric-vals { display: flex; gap: 0.75rem; }
+.rep-metric-val { font-size: 0.88rem; font-weight: 600; color: #e0e0e0; }
+
+/* Workout history list */
+.rep-history-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.rep-history-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.5rem;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: background 0.15s;
+}
+.rep-history-row:hover { background: rgba(255,255,255,0.06); }
+.rep-history-row.is-done { border-color: rgba(132,204,22,0.15); }
+.rep-history-icon { font-size: 1.2rem; width: 28px; text-align: center; flex-shrink: 0; }
+.rep-history-info { flex: 1; min-width: 0; }
+.rep-history-name { font-size: 0.92rem; font-weight: 600; color: #e0e0e0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rep-history-dates { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.15rem; }
+.rep-history-done-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #84cc16;
+  background: rgba(132,204,22,0.12);
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+}
+.rep-history-plan-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+  background: rgba(255,255,255,0.07);
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+}
+.rep-history-date { font-size: 0.78rem; color: var(--clr-text-muted, #888); }
+.rep-history-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; flex-shrink: 0; }
+.rep-history-dur { font-size: 0.8rem; color: #84cc16; font-weight: 600; }
+.rep-history-pending {
+  font-size: 0.7rem;
+  color: #f59e0b;
+  background: rgba(245,158,11,0.12);
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+}

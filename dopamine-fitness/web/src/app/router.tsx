@@ -11,7 +11,6 @@ const WorkoutBuilderPage = lazy(() => import("../pages/WorkoutBuilderPage").then
 const ExerciseCatalogPage = lazy(() => import("../pages/ExerciseCatalogPage").then((m) => ({ default: m.ExerciseCatalogPage })));
 const ExerciseDetailsPage = lazy(() => import("../pages/ExerciseDetailsPage").then((m) => ({ default: m.ExerciseDetailsPage })));
 const MyExercisesPage = lazy(() => import("../pages/MyExercisesPage").then((m) => ({ default: m.MyExercisesPage })));
-const ProgressPage = lazy(() => import("../pages/ProgressPage").then((m) => ({ default: m.ProgressPage })));
 const CalendarPage = lazy(() => import("../pages/CalendarPage").then((m) => ({ default: m.CalendarPage })));
 const AdminPage = lazy(() => import("../pages/AdminPage").then((m) => ({ default: m.AdminPage })));
 const SettingsPage = lazy(() => import("../pages/SettingsPage").then((m) => ({ default: m.SettingsPage })));
@@ -32,7 +31,8 @@ export function AppRouter() {
           <Route path="exercises" element={<ExerciseCatalogPage />} />
           <Route path="exercises/:id" element={<ExerciseDetailsPage />} />
           <Route path="my-exercises" element={<MyExercisesPage />} />
-          <Route path="progress" element={<ProgressPage />} />
+          <Route path="progress" element={<Navigate to="/report" replace />} />
+          <Route path="report" element={<ReportPage />} />
           <Route path="calendar" element={<CalendarPage />} />
           <Route path="admin" element={<AdminPage />} />
           <Route path="settings" element={<SettingsPage />} />
