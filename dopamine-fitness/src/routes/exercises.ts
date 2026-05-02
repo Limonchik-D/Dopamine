@@ -43,6 +43,16 @@ exerciseRoutes.post("/sync", requireRole("admin"), async (c) => {
   return c.json({ success: true, data: result });
 });
 
+// POST /exercises/translate — admin: translate a batch of untranslated exercises via MyMemory
+// Переводит до batchSize упражнений за один вызов. Запускайте повторно пока remaining > 0.
+exerciseRoutes.post("/translate", requireRole("admin"), async (c) => {
+  const body = await c.req.json().catch(() => ({})) as { batchSize?: number };
+  const batchSize = Math.min(Math.max(body.batchSize ?? 50, 1), 100);
+  const service = new ExerciseService(c.env);
+  const result = await service.translateCatalog(batchSize);
+  return c.json({ success: true, data: result });
+});
+
 // GET /exercises/:id
 exerciseRoutes.get("/:id", async (c) => {
   const id = parseInt(c.req.param("id"), 10);

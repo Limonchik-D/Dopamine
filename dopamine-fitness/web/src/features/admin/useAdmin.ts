@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiClient } from "../../services/apiClient";
 
 export type AdminOverview = {
@@ -56,5 +56,19 @@ export function useAdminDiagnostics(enabled: boolean) {
     enabled,
     refetchInterval: enabled ? 60_000 : false,
     staleTime: 30_000,
+  });
+}
+
+export function useSyncCatalog() {
+  return useMutation({
+    mutationFn: (force: boolean) =>
+      apiClient.post<{ synced: number; source: string }>("/exercises/sync", { force }),
+  });
+}
+
+export function useTranslateCatalog() {
+  return useMutation({
+    mutationFn: (batchSize: number) =>
+      apiClient.post<{ translated: number; remaining: number }>("/exercises/translate", { batchSize }),
   });
 }

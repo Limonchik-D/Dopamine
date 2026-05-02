@@ -112,4 +112,39 @@ export class ExerciseRepository {
       .all<{ body_part: string }>();
     return rows.results.map((r) => r.body_part);
   }
+
+  /** Упражнения без русского перевода названия */
+  async findUntranslated(limit: number): Promise<Array<{ id: number; name_en: string; instructions_en: string | null }>> {
+    const rows = await this.db
+      .prepare(
+        `SELECT id, name_en, instructions_en
+         FROM exercise_catalog
+         WHERE name_ru IS NULL OR name_ru = ''
+         ORDER BY id
+         LIMIT ?1`
+      )
+      .bind(limit)
+      .all<{ id: number; name_en: string; instructions_en: string | null }>();
+    return rows.results;
+  }
+
+  /** Сохранить русские переводы названия и описания */
+  async updateTranslation(id: number, name_ru: string | null, instructions_ru: string | null): Promise<void> {
+    await this.db
+      .prepare(
+        `UPDATE exercise_catalog
+         SET name_ru = ?1, instructions_ru = ?2
+         WHERE id = ?3`
+      )
+      .bind(name_ru, instructions_ru, id)
+      .run();
+  }
+
+  /** Количество непереведённых упражнений */
+  async countUntranslated(): Promise<number> {
+    const row = await this.db
+      .prepare("SELECT COUNT(*) as cnt FROM exercise_catalog WHERE name_ru IS NULL OR name_ru = ''")
+      .first<{ cnt: number }>();
+    return row?.cnt ?? 0;
+  }
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
@@ -153,8 +153,21 @@ function ExerciseCard({
 
 export function ExerciseCatalogPage() {
   const [filters, setFilters] = useState<ExerciseFilters>({ page: 1, limit: PAGE_SIZE });
+  const [searchInput, setSearchInput] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [addToWorkoutEx, setAddToWorkoutEx] = useState<Exercise | null>(null);
+
+  // Debounce: отправляем поисковый запрос только после 400мс паузы
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFilters((prev) => ({
+        ...prev,
+        search: searchInput || undefined,
+        page: 1,
+      }));
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   const { data, isLoading, isFetching } = useExercises(filters);
   const { data: filterOptions } = useExerciseFilterOptions();
@@ -163,7 +176,7 @@ export function ExerciseCatalogPage() {
 
   const favSet = new Set(favorites?.map((f) => f.exercise_id).filter(Boolean) as number[]);
 
-  const setFilter = (key: keyof ExerciseFilters, value: string) => {
+  const setFilter = (key: keyof Omit<ExerciseFilters, "search">, value: string) => {
     setFilters((prev) => ({
       ...prev,
       [key]: value || undefined,
@@ -206,9 +219,9 @@ export function ExerciseCatalogPage() {
             </Button>
           </div>
           <input
-            value={filters.search ?? ""}
-            onChange={(e) => setFilter("search", e.target.value)}
-            placeholder="Поиск по названию…"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Поиск на английском (напр. bench press, squat…)"
             style={{ marginTop: "var(--space-sm)" }}
           />
           {total > 0 && (
@@ -265,10 +278,10 @@ export function ExerciseCatalogPage() {
               </select>
             </div>
 
-            {(filters.target || filters.equipment || filters.body_part || filters.search) && (
+            {(filters.target || filters.equipment || filters.body_part || searchInput) && (
               <Button
                 className="btn-ghost"
-                onClick={() => setFilters({ page: 1, limit: PAGE_SIZE })}
+                onClick={() => { setSearchInput(""); setFilters({ page: 1, limit: PAGE_SIZE }); }}
                 style={{ marginTop: "var(--space-xs)" }}
               >
                 Сбросить

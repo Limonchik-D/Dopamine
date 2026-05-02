@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Card } from "../components/ui/Card";
-import { useAdminDiagnostics, useAdminOverview, useAdminUsers } from "../features/admin/useAdmin";
+import { Button } from "../components/ui/Button";
+import { useAdminDiagnostics, useAdminOverview, useAdminUsers, useSyncCatalog, useTranslateCatalog } from "../features/admin/useAdmin";
 import { useMe } from "../features/auth/useAuth";
 
 export function AdminPage() {
@@ -9,6 +11,10 @@ export function AdminPage() {
   const overview = useAdminOverview(isAdmin);
   const users = useAdminUsers(isAdmin);
   const diagnostics = useAdminDiagnostics(isAdmin);
+  const syncCatalog = useSyncCatalog();
+  const translateCatalog = useTranslateCatalog();
+  const [syncResult, setSyncResult] = useState<string | null>(null);
+  const [translateResult, setTranslateResult] = useState<{ translated: number; remaining: number } | null>(null);
 
   if (meLoading) {
     return (
@@ -83,6 +89,34 @@ export function AdminPage() {
               Обновлено: {diagnostics.data ? new Date(diagnostics.data.ts).toLocaleString("ru-RU") : "n/a"}
             </p>
           </div>
+        )}
+      </Card>
+
+      <Card>
+        <h3>Каталог упражнений</h3>
+        <p className="daily-checkin-subtitle">
+          Синхронизация загружает упражнения из Wger. Перевод переводит названия и описания на русский через MyMemory API (50 штук за вызов, ~200мс/упражнение).
+        </p>
+        <div style={{ display: "flex", gap: "var(--space-sm)", flexWrap: "wrap", marginTop: "var(--space-sm)" }}>
+          <Button
+            onClick={() => syncCatalog.mutate(true, { onSuccess: (d) => setSyncResult(`Синхронизировано: ${d.synced} (${d.source})`) })}
+            disabled={syncCatalog.isPending}
+          >
+            {syncCatalog.isPending ? "Синхронизация…" : "🔄 Синхронизировать каталог"}
+          </Button>
+          <Button
+            onClick={() => translateCatalog.mutate(50, { onSuccess: (d) => setTranslateResult(d) })}
+            disabled={translateCatalog.isPending}
+          >
+            {translateCatalog.isPending ? "Переводим…" : "🌐 Перевести следующие 50"}
+          </Button>
+        </div>
+        {syncResult && <p className="daily-checkin-subtitle" style={{ marginTop: "var(--space-xs)" }}>✅ {syncResult}</p>}
+        {translateResult && (
+          <p className="daily-checkin-subtitle" style={{ marginTop: "var(--space-xs)" }}>
+            ✅ Переведено: {translateResult.translated} · Осталось: {translateResult.remaining}
+            {translateResult.remaining > 0 && " — нажмите снова для продолжения"}
+          </p>
         )}
       </Card>
 

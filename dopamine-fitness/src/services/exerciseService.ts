@@ -3,9 +3,44 @@ import type { ExerciseFilterInput } from "../validators/schemas.js";
 import { ExerciseRepository } from "../repositories/exerciseRepository.js";
 import { ExerciseDBIntegration } from "../integrations/exercisedb/client.js";
 import { WgerIntegration } from "../integrations/wger/client.js";
+import { TranslationService } from "./translationService.js";
 import { getAppConfig } from "../config/env.js";
 
 const CATALOG_CACHE_KEY = "exercise_catalog_synced";
+
+// Русские переводы категорий и оборудования из Wger
+const CATEGORY_RU: Record<string, string> = {
+  Abs: "Пресс",
+  Arms: "Руки",
+  Back: "Спина",
+  Calves: "Икры",
+  Chest: "Грудь",
+  Legs: "Ноги",
+  Shoulders: "Плечи",
+};
+
+const EQUIPMENT_RU: Record<string, string> = {
+  Barbell: "Штанга",
+  "Body weight": "Без оборудования",
+  Dumbbell: "Гантели",
+  Cables: "Блок/тросы",
+  Kettlebell: "Гиря",
+  "Resistance Band": "Эспандер",
+  "Bench": "Скамья",
+  "Pull-up Bar": "Турник",
+  Machine: "Тренажёр",
+  Plate: "Диск",
+  "Ez-Bar": "EZ-гриф",
+  "Medicine Ball": "Медбол",
+  "Foam Roll": "Ролл",
+  "Incline Bench": "Наклонная скамья",
+  "Decline Bench": "Обратная скамья",
+  "Swiss Ball": "Фитбол",
+  "Pec deck": "Баттерфляй",
+  "Rope": "Канат",
+  "Sled": "Сани",
+  none: "Без оборудования",
+};
 
 export class ExerciseService {
   private repo: ExerciseRepository;
@@ -81,14 +116,17 @@ export class ExerciseService {
       for (const ex of exercises) {
         const name = WgerIntegration.getName(ex);
         const description = WgerIntegration.getDescription(ex);
+        const bodyPart = ex.category?.name ?? null;
+        const equipment = ex.equipment[0]?.name ?? null;
+        const target = ex.muscles[0]?.name_en ?? ex.muscles[0]?.name ?? null;
         await this.repo.upsertFromExternal({
           source: "wger",
           source_exercise_id: String(ex.id),
           name_en: name,
           name_ru: null,
-          target: ex.muscles[0]?.name_en ?? ex.muscles[0]?.name ?? null,
-          equipment: ex.equipment[0]?.name ?? null,
-          body_part: ex.category?.name ?? null,
+          target: target,
+          equipment: equipment ? (EQUIPMENT_RU[equipment] ?? equipment) : null,
+          body_part: bodyPart ? (CATEGORY_RU[bodyPart] ?? bodyPart) : null,
           gif_url: null,
           image_url: null,
           instructions_en: description || null,
@@ -113,8 +151,8 @@ export class ExerciseService {
             name_en: ex.name,
             name_ru: null,
             target: ex.target,
-            equipment: ex.equipment,
-            body_part: ex.bodyPart,
+            equipment: ex.equipment ? (EQUIPMENT_RU[ex.equipment] ?? ex.equipment) : null,
+            body_part: ex.bodyPart ? (CATEGORY_RU[ex.bodyPart] ?? ex.bodyPart) : null,
             gif_url: ex.gifUrl,
             image_url: null,
             instructions_en: ex.instructions.join(" "),
@@ -128,5 +166,34 @@ export class ExerciseService {
     }
 
     return { synced: 0, source: "failed" };
+  }
+
+  /**
+   * Переводит пачку непереведённых упражнений через MyMemory API.
+   * @param batchSize — сколько упражнений переводить за один вызов (по умолчанию 50)
+   * @returns { translated, remaining }
+   */
+  async translateCatalog(batchSize = 50): Promise<{ translated: number; remaining: number }> {
+    const translator = new TranslationService(this.env.KV);
+    const untranslated = await this.repo.findUntranslated(batchSize);
+
+    if (untranslated.length === 0) {
+      const remaining = await this.repo.countUntranslated();
+      return { translated: 0, remaining };
+    }
+
+    const results = await translator.translateBatch(untranslated);
+
+    for (const r of results) {
+      if (r.name_ru) {
+        await this.repo.updateTranslation(r.id, r.name_ru, r.instructions_ru);
+      }
+    }
+
+    // Сбрасываем кеш фильтров после перевода
+    await this.env.KV.delete("exercise_filters");
+
+    const remaining = await this.repo.countUntranslated();
+    return { translated: results.filter((r) => r.name_ru !== null).length, remaining };
   }
 }
