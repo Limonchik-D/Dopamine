@@ -50,7 +50,7 @@ const PERIOD_LABELS: Record<StatsPeriod, string> = {
   year: "12 мес.",
 };
 
-function mapWorkoutPoints(points: StatsPoint[], metric: Metric): ChartPoint[] {
+function mapWorkoutPoints(points: StatsPoint[], metric: WorkoutMetric): ChartPoint[] {
   return points.map((p) => ({ date: p.date, value: p[metric] ?? 0 }));
 }
 
