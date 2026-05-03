@@ -59,39 +59,19 @@ app.get("/health", (c) =>
 
 app.get("/health/dependencies", async (c) => {
   const config = getAppConfig(c.env);
-
-  let dbOk = false;
-  let kvOk = false;
-
-  try {
-    const row = await c.env.DB.prepare("SELECT 1 AS ok").first<{ ok: number }>();
-    dbOk = row?.ok === 1;
-  } catch {
-    dbOk = false;
-  }
-
-  try {
-    await c.env.KV.get("health:ping");
-    kvOk = true;
-  } catch {
-    kvOk = false;
-  }
-
-  const ready = dbOk && kvOk;
+  const { getDependenciesHealth } = await import("./utils/health.js");
+  const health = await getDependenciesHealth(c.env);
 
   return c.json(
     {
-      status: ready ? "ok" : "degraded",
-      ready,
+      status: health.ready ? "ok" : "degraded",
+      ready: health.ready,
       app: config.appName,
       env: config.environment,
-      dependencies: {
-        db: dbOk,
-        kv: kvOk,
-      },
+      dependencies: { db: health.db, kv: health.kv },
       ts: new Date().toISOString(),
     },
-    ready ? 200 : 503
+    health.ready ? 200 : 503
   );
 });
 

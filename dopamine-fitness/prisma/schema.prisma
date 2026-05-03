@@ -1,0 +1,295 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  user
+  admin
+}
+
+enum ExerciseSource {
+  exercisedb
+  wger
+  seed
+  custom
+}
+
+enum ExternalSource {
+  exercisedb
+  wger
+  ninjas
+}
+
+enum MediaType {
+  image
+  gif
+  video
+}
+
+// ─── Users ────────────────────────────────────────────────────────────────────
+
+model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  password_hash String
+  username      String   @unique
+  role          UserRole @default(user)
+  google_sub    String?  @unique
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now()) @updatedAt
+
+  profile            UserProfile?
+  settings           UserSettings?
+  workouts           Workout[]
+  custom_exercises   CustomExercise[]
+  favorites          Favorite[]
+  progress_snapshots ProgressSnapshot[]
+  daily_checkins     DailyCheckin[]
+  body_metrics       BodyMetric[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  user_id    Int     @id
+  user       User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  avatar_url String?
+  bio        String?
+  locale     String  @default("ru")
+  theme      String  @default("calm")
+  units      String  @default("metric")
+  height_cm  Float?
+  weight_kg  Float?
+
+  @@map("user_profiles")
+}
+
+model UserSettings {
+  user_id               Int     @id
+  user                  User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  theme                 String  @default("calm")
+  locale                String  @default("ru")
+  units                 String  @default("metric")
+  notifications_enabled Boolean @default(true)
+
+  @@map("user_settings")
+}
+
+// ─── Exercises ────────────────────────────────────────────────────────────────
+
+model ExerciseCatalog {
+  id                 Int            @id @default(autoincrement())
+  source             ExerciseSource
+  source_exercise_id String
+  name_en            String
+  name_ru            String?
+  target             String?
+  equipment          String?
+  body_part          String?
+  gif_url            String?
+  image_url          String?
+  instructions_en    String?
+  instructions_ru    String?
+  difficulty         String?
+  secondary_muscles  String?
+  name_normalized    String?
+
+  workout_exercises  WorkoutExercise[]
+  favorites          Favorite[]
+  progress_snapshots ProgressSnapshot[]
+  exercise_media     ExerciseMedia[]
+  name_mappings      ExerciseNameMap[]
+
+  @@unique([source, source_exercise_id])
+  @@index([name_en])
+  @@index([name_normalized])
+  @@index([target])
+  @@index([equipment])
+  @@index([body_part])
+  @@map("exercise_catalog")
+}
+
+model CustomExercise {
+  id           Int       @id @default(autoincrement())
+  user_id      Int
+  user         User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  name         String
+  description  String?
+  target       String?
+  equipment    String?
+  photo_r2_key String?
+  created_at   DateTime  @default(now())
+  deleted_at   DateTime?
+
+  workout_exercises  WorkoutExercise[]
+  favorites          Favorite[]
+  progress_snapshots ProgressSnapshot[]
+  exercise_media     ExerciseMedia[]
+
+  @@index([user_id])
+  @@map("custom_exercises")
+}
+
+model ExerciseMedia {
+  id                 Int              @id @default(autoincrement())
+  exercise_id        Int?
+  exercise           ExerciseCatalog? @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
+  custom_exercise_id Int?
+  custom_exercise    CustomExercise?  @relation(fields: [custom_exercise_id], references: [id], onDelete: Cascade)
+  r2_key             String
+  media_type         MediaType
+  created_at         DateTime         @default(now())
+
+  @@map("exercise_media")
+}
+
+model ExerciseNameMap {
+  id              Int             @id @default(autoincrement())
+  exercise_id     Int
+  exercise        ExerciseCatalog @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
+  external_source ExternalSource
+  external_id     String
+  external_name   String
+  confidence      Float           @default(1.0)
+  created_at      DateTime        @default(now())
+
+  @@unique([exercise_id, external_source])
+  @@index([exercise_id])
+  @@index([external_source, external_id])
+  @@map("exercise_name_map")
+}
+
+// ─── Workouts ─────────────────────────────────────────────────────────────────
+
+model Workout {
+  id               Int       @id @default(autoincrement())
+  user_id          Int
+  user             User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  name             String
+  description      String?
+  workout_date     String
+  notes            String?
+  completed_at     DateTime?
+  duration_minutes Int?
+  created_at       DateTime  @default(now())
+  deleted_at       DateTime?
+
+  exercises WorkoutExercise[]
+
+  @@index([user_id])
+  @@index([workout_date])
+  @@index([created_at])
+  @@map("workouts")
+}
+
+model WorkoutExercise {
+  id                 Int              @id @default(autoincrement())
+  workout_id         Int
+  workout            Workout          @relation(fields: [workout_id], references: [id], onDelete: Cascade)
+  exercise_id        Int?
+  exercise           ExerciseCatalog? @relation(fields: [exercise_id], references: [id], onDelete: SetNull)
+  custom_exercise_id Int?
+  custom_exercise    CustomExercise?  @relation(fields: [custom_exercise_id], references: [id], onDelete: SetNull)
+  order_index        Int              @default(0)
+  target_muscle      String?
+  equipment          String?
+  created_at         DateTime         @default(now())
+
+  sets Set[]
+
+  @@index([workout_id])
+  @@index([exercise_id])
+  @@map("workout_exercises")
+}
+
+model Set {
+  id                  Int             @id @default(autoincrement())
+  workout_exercise_id Int
+  workout_exercise    WorkoutExercise @relation(fields: [workout_exercise_id], references: [id], onDelete: Cascade)
+  set_number          Int
+  weight              Float?
+  reps                Int?
+  rest_seconds        Int?
+  rir                 Int?
+  completed           Boolean         @default(false)
+
+  @@index([workout_exercise_id])
+  @@map("sets")
+}
+
+// ─── Favorites ────────────────────────────────────────────────────────────────
+
+model Favorite {
+  id                 Int              @id @default(autoincrement())
+  user_id            Int
+  user               User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  exercise_id        Int?
+  exercise           ExerciseCatalog? @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
+  custom_exercise_id Int?
+  custom_exercise    CustomExercise?  @relation(fields: [custom_exercise_id], references: [id], onDelete: Cascade)
+  created_at         DateTime         @default(now())
+
+  @@unique([user_id, exercise_id])
+  @@unique([user_id, custom_exercise_id])
+  @@index([user_id])
+  @@map("favorites")
+}
+
+// ─── Progress ─────────────────────────────────────────────────────────────────
+
+model ProgressSnapshot {
+  id                 Int              @id @default(autoincrement())
+  user_id            Int
+  user               User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  exercise_id        Int?
+  exercise           ExerciseCatalog? @relation(fields: [exercise_id], references: [id], onDelete: SetNull)
+  custom_exercise_id Int?
+  custom_exercise    CustomExercise?  @relation(fields: [custom_exercise_id], references: [id], onDelete: SetNull)
+  date               String
+  weight             Float?
+  reps               Int?
+  volume             Float?
+  one_rm_estimate    Float?
+
+  @@unique([user_id, exercise_id, date])
+  @@unique([user_id, custom_exercise_id, date])
+  @@index([user_id])
+  @@index([exercise_id])
+  @@index([date])
+  @@map("progress_snapshots")
+}
+
+// ─── Daily Check-ins ─────────────────────────────────────────────────────────
+
+model DailyCheckin {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  user         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  checkin_date String
+  created_at   DateTime @default(now())
+
+  @@unique([user_id, checkin_date])
+  @@index([user_id, checkin_date])
+  @@map("daily_checkins")
+}
+
+// ─── Body Metrics ─────────────────────────────────────────────────────────────
+
+model BodyMetric {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  weight_kg   Float?
+  height_cm   Float?
+  measured_at DateTime @default(now())
+
+  @@index([user_id, measured_at])
+  @@map("body_metrics")
+}

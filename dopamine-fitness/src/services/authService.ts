@@ -9,12 +9,11 @@ export class AuthService {
   private repo: UserRepository;
 
   constructor(
-    db: D1Database,
     private jwtSecret: string,
     private jwtExpiresIn: number,
     private adminEmails: string[] = []
   ) {
-    this.repo = new UserRepository(db);
+    this.repo = new UserRepository();
   }
 
   private normalizeEmail(email: string) {

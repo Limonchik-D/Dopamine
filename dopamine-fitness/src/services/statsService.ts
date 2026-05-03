@@ -22,8 +22,8 @@ export type StatsSummary = {
 export class StatsService {
   private repo: StatsRepository;
 
-  constructor(db: D1Database) {
-    this.repo = new StatsRepository(db);
+  constructor() {
+    this.repo = new StatsRepository();
   }
 
   async getStats(

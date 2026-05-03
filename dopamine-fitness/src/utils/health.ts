@@ -1,4 +1,5 @@
 import type { Env } from "../types/index.js";
+import { prisma } from "../db/prisma.js";
 
 export type DependenciesHealth = {
   db: boolean;
@@ -11,8 +12,8 @@ export async function getDependenciesHealth(env: Env): Promise<DependenciesHealt
   let kv = false;
 
   try {
-    const row = await env.DB.prepare("SELECT 1 AS ok").first<{ ok: number }>();
-    db = row?.ok === 1;
+    await prisma.$queryRaw`SELECT 1`;
+    db = true;
   } catch {
     db = false;
   }

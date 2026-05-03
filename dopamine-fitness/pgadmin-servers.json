@@ -1,0 +1,15 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Dopamine Local",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "dopamine_db",
+      "Username": "dopamine",
+      "Password": "David4da",
+      "SSLMode": "prefer",
+      "SavePassword": true
+    }
+  }
+}

@@ -4,13 +4,13 @@
  * Каждый перевод кешируется в KV на 30 дней — повторные вызовы бесплатны.
  */
 
-import type { KVNamespace } from "@cloudflare/workers-types";
+import type { AppKV } from "../types/index.js";
 
 const MYMEMORY_URL = "https://api.mymemory.translated.net/get";
 const CACHE_TTL_SECONDS = 30 * 24 * 60 * 60; // 30 дней
 
 export class TranslationService {
-  constructor(private kv: KVNamespace) {}
+  constructor(private kv: AppKV) {}
 
   /**
    * Переводит строку с английского на русский.

@@ -8,6 +8,7 @@ import { authRateLimiter } from "../middlewares/rateLimiter.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { revokeToken } from "../utils/tokenBlocklist.js";
 import { verifyJwt } from "../utils/jwt.js";
+import { prisma } from "../db/prisma.js";
 
 type GoogleTokenResponse = {
   access_token?: string;
@@ -43,7 +44,6 @@ authRoutes.post("/register", async (c) => {
   const input = validate(registerSchema, body);
 
   const service = new AuthService(
-    c.env.DB,
     config.jwt.secret,
     config.jwt.expiresInSeconds,
     config.auth.adminEmails
@@ -52,13 +52,17 @@ authRoutes.post("/register", async (c) => {
 
   // Сохраняем вес и рост при регистрации
   if (input.weight_kg || input.height_cm) {
-    await c.env.DB
-      .prepare(`INSERT INTO user_profiles (user_id, weight_kg, height_cm) VALUES (?1, ?2, ?3)
-        ON CONFLICT(user_id) DO UPDATE SET weight_kg = COALESCE(?2, weight_kg), height_cm = COALESCE(?3, height_cm)`)
-      .bind(user.id, input.weight_kg ?? null, input.height_cm ?? null).run();
-    await c.env.DB
-      .prepare("INSERT INTO body_metrics (user_id, weight_kg, height_cm) VALUES (?1, ?2, ?3)")
-      .bind(user.id, input.weight_kg ?? null, input.height_cm ?? null).run();
+    await prisma.userProfile.upsert({
+      where: { user_id: user.id },
+      create: { user_id: user.id, weight_kg: input.weight_kg ?? null, height_cm: input.height_cm ?? null },
+      update: {
+        ...(input.weight_kg !== undefined && { weight_kg: input.weight_kg }),
+        ...(input.height_cm !== undefined && { height_cm: input.height_cm }),
+      },
+    });
+    await prisma.bodyMetric.create({
+      data: { user_id: user.id, weight_kg: input.weight_kg ?? null, height_cm: input.height_cm ?? null },
+    });
   }
 
   return c.json({ success: true, data: { user, token } }, 201);
@@ -70,7 +74,6 @@ authRoutes.post("/login", async (c) => {
   const input = validate(loginSchema, body);
 
   const service = new AuthService(
-    c.env.DB,
     config.jwt.secret,
     config.jwt.expiresInSeconds,
     config.auth.adminEmails
@@ -170,7 +173,6 @@ authRoutes.get("/google/callback", async (c) => {
   }
 
   const service = new AuthService(
-    c.env.DB,
     config.jwt.secret,
     config.jwt.expiresInSeconds,
     config.auth.adminEmails
@@ -191,3 +193,4 @@ authRoutes.get("/google/callback", async (c) => {
 
   return c.redirect(redirect.toString(), 302);
 });
+

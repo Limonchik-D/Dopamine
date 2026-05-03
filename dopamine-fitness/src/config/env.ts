@@ -33,6 +33,40 @@ export interface AppConfig {
   };
 }
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/**
+ * Read a key from the Hono/CF env object OR from process.env as fallback.
+ * Safe in both Cloudflare Workers (no process) and Node.js environments.
+ */
+function envVar(envObj: Partial<Env> | undefined, key: string): string | undefined {
+  const fromObj = (envObj as Record<string, unknown> | undefined)?.[key];
+  if (typeof fromObj === "string" && fromObj.trim()) return fromObj.trim();
+
+  // Fallback: process.env (Node.js only — not available in CF Workers)
+  try {
+    const fromProcess = (globalThis as unknown as { process?: { env: Record<string, string> } })
+      .process?.env?.[key];
+    if (typeof fromProcess === "string" && fromProcess.trim()) return fromProcess.trim();
+  } catch {
+    // CF Workers — process is not defined, ignore
+  }
+  return undefined;
+}
+
+function requireString(envObj: Partial<Env> | undefined, key: string): string {
+  const value = envVar(envObj, key);
+  if (!value) throw new Error(`Missing required env variable: ${key}`);
+  return value;
+}
+
+function requirePositiveInt(envObj: Partial<Env> | undefined, key: string): number {
+  const parsed = Number.parseInt(requireString(envObj, key), 10);
+  if (!Number.isFinite(parsed) || parsed <= 0)
+    throw new Error(`Invalid env variable ${key}. Expected positive integer.`);
+  return parsed;
+}
+
 function parseOptionalPositiveInt(value: string | undefined, fallback: number): number {
   const normalized = value?.trim();
   if (!normalized) return fallback;
@@ -41,80 +75,65 @@ function parseOptionalPositiveInt(value: string | undefined, fallback: number): 
   return parsed;
 }
 
-function resetIfOriginMismatch(env: Env) {
-  const expectedFingerprint = `${env.ENVIRONMENT}|${env.APP_NAME}|${env.APP_ALLOWED_ORIGINS}|${env.GOOGLE_CLIENT_ID ?? ""}|${env.GOOGLE_REDIRECT_URI ?? ""}|${env.ADMIN_EMAILS ?? ""}`;
-  const marker = (globalThis as unknown as { __df_cfg_marker?: string }).__df_cfg_marker;
-  if (marker && marker !== expectedFingerprint) {
-    cachedConfig = null;
-  }
-  (globalThis as unknown as { __df_cfg_marker?: string }).__df_cfg_marker = expectedFingerprint;
-}
-
-let cachedConfig: AppConfig | null = null;
-
-function requireString(name: keyof Env, value: string | undefined): string {
-  const normalized = value?.trim();
-  if (!normalized) {
-    throw new Error(`Missing required env variable: ${String(name)}`);
-  }
-  return normalized;
-}
-
 function parseCsv(value: string | undefined): string[] {
   const raw = value?.trim();
   if (!raw) return [];
-  return raw
-    .split(",")
-    .map((item) => item.trim())
-    .filter((item) => item.length > 0);
+  return raw.split(",").map((s) => s.trim()).filter(Boolean);
 }
 
-function requirePositiveInt(name: keyof Env, value: string | undefined): number {
-  const parsed = Number.parseInt(requireString(name, value), 10);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    throw new Error(`Invalid env variable ${String(name)}. Expected positive integer.`);
-  }
-  return parsed;
-}
+// ─── Cached config ────────────────────────────────────────────────────────────
 
-export function getAppConfig(env: Env): AppConfig {
-  resetIfOriginMismatch(env);
-  if (cachedConfig) return cachedConfig;
+let cachedConfig: AppConfig | null = null;
+let cachedFingerprint: string | null = null;
 
+export function getAppConfig(env?: Partial<Env>): AppConfig {
+  const fingerprint = JSON.stringify({
+    env: env?.ENVIRONMENT,
+    app: env?.APP_NAME,
+    origins: env?.APP_ALLOWED_ORIGINS,
+  });
+
+  if (cachedConfig && cachedFingerprint === fingerprint) return cachedConfig;
+
+  const e = env;
   cachedConfig = {
-    environment: env.ENVIRONMENT,
-    appName: requireString("APP_NAME", env.APP_NAME),
+    environment: (envVar(e, "ENVIRONMENT") ?? "development") as Env["ENVIRONMENT"],
+    appName: requireString(e, "APP_NAME"),
     jwt: {
-      secret: requireString("JWT_SECRET", env.JWT_SECRET),
-      expiresInSeconds: requirePositiveInt("JWT_EXPIRES_IN", env.JWT_EXPIRES_IN),
+      secret: requireString(e, "JWT_SECRET"),
+      expiresInSeconds: requirePositiveInt(e, "JWT_EXPIRES_IN"),
     },
     exercise: {
-      cacheTtlSeconds: requirePositiveInt("EXERCISE_CACHE_TTL", env.EXERCISE_CACHE_TTL),
-      exerciseDbBaseUrl: requireString("EXERCISEDB_BASE_URL", env.EXERCISEDB_BASE_URL),
-      exerciseDbApiKey: env.EXERCISEDB_API_KEY?.trim() ?? "",
-      wgerBaseUrl: requireString("WGER_BASE_URL", env.WGER_BASE_URL),
+      cacheTtlSeconds: requirePositiveInt(e, "EXERCISE_CACHE_TTL"),
+      exerciseDbBaseUrl: requireString(e, "EXERCISEDB_BASE_URL"),
+      exerciseDbApiKey: envVar(e, "EXERCISEDB_API_KEY") ?? "",
+      wgerBaseUrl: requireString(e, "WGER_BASE_URL"),
     },
     cache: {
-      statsTtlSeconds: parseOptionalPositiveInt(env.STATS_CACHE_TTL, 120),
-      checkinsTtlSeconds: parseOptionalPositiveInt(env.CHECKINS_CACHE_TTL, 60),
+      statsTtlSeconds: parseOptionalPositiveInt(envVar(e, "STATS_CACHE_TTL"), 120),
+      checkinsTtlSeconds: parseOptionalPositiveInt(envVar(e, "CHECKINS_CACHE_TTL"), 60),
     },
     uploads: {
-      maxSizeMb: requirePositiveInt("MAX_UPLOAD_SIZE_MB", env.MAX_UPLOAD_SIZE_MB),
+      maxSizeMb: requirePositiveInt(e, "MAX_UPLOAD_SIZE_MB"),
     },
     cors: {
-      allowedOrigins: parseCsv(env.APP_ALLOWED_ORIGINS),
+      allowedOrigins: parseCsv(envVar(e, "APP_ALLOWED_ORIGINS")),
     },
     auth: {
-      adminEmails: parseCsv(env.ADMIN_EMAILS).map((email) => email.toLowerCase()),
-      google: env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET && env.GOOGLE_REDIRECT_URI
-        ? {
-            clientId: requireString("GOOGLE_CLIENT_ID", env.GOOGLE_CLIENT_ID),
-            clientSecret: requireString("GOOGLE_CLIENT_SECRET", env.GOOGLE_CLIENT_SECRET),
-            redirectUri: requireString("GOOGLE_REDIRECT_URI", env.GOOGLE_REDIRECT_URI),
-          }
-        : undefined,
+      adminEmails: parseCsv(envVar(e, "ADMIN_EMAILS")).map((email) => email.toLowerCase()),
+      google:
+        envVar(e, "GOOGLE_CLIENT_ID") &&
+        envVar(e, "GOOGLE_CLIENT_SECRET") &&
+        envVar(e, "GOOGLE_REDIRECT_URI")
+          ? {
+              clientId: requireString(e, "GOOGLE_CLIENT_ID"),
+              clientSecret: requireString(e, "GOOGLE_CLIENT_SECRET"),
+              redirectUri: requireString(e, "GOOGLE_REDIRECT_URI"),
+            }
+          : undefined,
     },
   };
 
+  cachedFingerprint = fingerprint;
   return cachedConfig;
 }

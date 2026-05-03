@@ -12,9 +12,9 @@ export class WorkoutService {
   private repo: WorkoutRepository;
   private statsRepo: StatsRepository;
 
-  constructor(db: D1Database) {
-    this.repo = new WorkoutRepository(db);
-    this.statsRepo = new StatsRepository(db);
+  constructor() {
+    this.repo = new WorkoutRepository();
+    this.statsRepo = new StatsRepository();
   }
 
   async list(
@@ -77,6 +77,11 @@ export class WorkoutService {
   async delete(id: number, userId: number): Promise<void> {
     const deleted = await this.repo.softDelete(id, userId);
     if (!deleted) throw new Error("Not found");
+  }
+
+  async complete(id: number, userId: number, durationMinutes: number | null): Promise<void> {
+    const done = await this.repo.complete(id, userId, durationMinutes);
+    if (!done) throw new Error("Not found");
   }
 
   // ─── Exercises ──────────────────────────────────────────────────────────────

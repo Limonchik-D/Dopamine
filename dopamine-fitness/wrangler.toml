@@ -9,13 +9,6 @@ not_found_handling = "single-page-application"
 binding = "ASSETS"
 run_worker_first = true
 
-# ─── D1 Database ────────────────────────────────────────────────────────────
-[[d1_databases]]
-binding = "DB"
-database_name = "dopamine-db"
-database_id = "98ad4284-f530-4917-8161-0a2a0561c88b"
-migrations_dir = "migrations"
-
 # ─── KV Namespaces ──────────────────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "KV"
@@ -45,10 +38,9 @@ ADMIN_EMAILS = "limonmilion2007@gmail.com"
 
 # ─── Secrets (set via: wrangler secret put SECRET_NAME) ─────────────────────
 # JWT_SECRET
+# DATABASE_URL           ← PostgreSQL connection string (Neon/Hyperdrive)
 # EXERCISEDB_API_KEY
-# NINJAS_API_KEY         ← API-Ninjas (optional, for difficulty + instructions)
 # GOOGLE_CLIENT_SECRET
-# BCRYPT_ROUNDS (optional, default 12)
 
 # ─── Local Development ──────────────────────────────────────────────────────
 [dev]
@@ -64,8 +56,3 @@ vars = { ENVIRONMENT = "staging", APP_ALLOWED_ORIGINS = "https://staging.example
 directory = "./web/dist"
 not_found_handling = "single-page-application"
 run_worker_first = true
-
-[[env.staging.d1_databases]]
-binding = "DB"
-database_name = "dopamine-db-staging"
-database_id = "REPLACE_WITH_STAGING_D1_ID"

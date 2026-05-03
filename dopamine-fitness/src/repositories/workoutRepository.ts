@@ -1,43 +1,101 @@
+import { prisma } from "../db/prisma.js";
 import type { Workout, WorkoutExercise, Set } from "../types/index.js";
-import { isUniqueConstraintError } from "../utils/dbErrors.js";
 import { conflict } from "../utils/appError.js";
 import { ErrorCodes } from "../utils/errorCodes.js";
 
-export class WorkoutRepository {
-  constructor(private db: D1Database) {}
+// ─── Date helpers ─────────────────────────────────────────────────────────────
 
+function d(date: Date | null | undefined): string | null {
+  return date ? date.toISOString() : null;
+}
+
+function mapWorkout(row: {
+  id: number;
+  user_id: number;
+  name: string;
+  description: string | null;
+  workout_date: string;
+  notes: string | null;
+  created_at: Date;
+  deleted_at: Date | null;
+  completed_at: Date | null;
+  duration_minutes: number | null;
+}): Workout {
+  return {
+    id: row.id,
+    user_id: row.user_id,
+    name: row.name,
+    description: row.description,
+    workout_date: row.workout_date,
+    notes: row.notes,
+    created_at: d(row.created_at)!,
+    deleted_at: d(row.deleted_at),
+    completed_at: d(row.completed_at),
+    duration_minutes: row.duration_minutes,
+  };
+}
+
+function mapSet(row: {
+  id: number;
+  workout_exercise_id: number;
+  set_number: number;
+  weight: number | null;
+  reps: number | null;
+  rest_seconds: number | null;
+  rir: number | null;
+  completed: boolean;
+}): Set {
+  return {
+    id: row.id,
+    workout_exercise_id: row.workout_exercise_id,
+    set_number: row.set_number,
+    weight: row.weight,
+    reps: row.reps,
+    rest_seconds: row.rest_seconds,
+    rir: row.rir,
+    completed: row.completed,
+  };
+}
+
+const WORKOUT_SELECT = {
+  id: true,
+  user_id: true,
+  name: true,
+  description: true,
+  workout_date: true,
+  notes: true,
+  created_at: true,
+  deleted_at: true,
+  completed_at: true,
+  duration_minutes: true,
+} as const;
+
+export class WorkoutRepository {
   async findByUser(
     userId: number,
     limit: number,
     offset: number
   ): Promise<{ workouts: Workout[]; total: number }> {
-    const [rows, countRow] = await Promise.all([
-      this.db
-        .prepare(
-          `SELECT * FROM workouts
-           WHERE user_id = ?1 AND deleted_at IS NULL
-           ORDER BY workout_date DESC, created_at DESC
-           LIMIT ?2 OFFSET ?3`
-        )
-        .bind(userId, limit, offset)
-        .all<Workout>(),
-      this.db
-        .prepare("SELECT COUNT(*) as cnt FROM workouts WHERE user_id = ?1 AND deleted_at IS NULL")
-        .bind(userId)
-        .first<{ cnt: number }>(),
+    const where = { user_id: userId, deleted_at: null };
+    const [rows, total] = await Promise.all([
+      prisma.workout.findMany({
+        where,
+        select: WORKOUT_SELECT,
+        orderBy: [{ workout_date: "desc" }, { created_at: "desc" }],
+        take: limit,
+        skip: offset,
+      }),
+      prisma.workout.count({ where }),
     ]);
-
-    return { workouts: rows.results, total: countRow?.cnt ?? 0 };
+    return { workouts: rows.map(mapWorkout), total };
   }
 
   async findById(id: number, userId: number): Promise<Workout | null> {
-    const row = await this.db
-      .prepare(
-        "SELECT * FROM workouts WHERE id = ?1 AND user_id = ?2 AND deleted_at IS NULL"
-      )
-      .bind(id, userId)
-      .first<Workout>();
-    return row ?? null;
+    const row = await prisma.workout.findFirst({
+      where: { id, user_id: userId, deleted_at: null },
+      select: WORKOUT_SELECT,
+    });
+    return row ? mapWorkout(row) : null;
   }
 
   async create(
@@ -47,16 +105,11 @@ export class WorkoutRepository {
     workoutDate: string,
     notes: string | null
   ): Promise<Workout> {
-    const row = await this.db
-      .prepare(
-        `INSERT INTO workouts (user_id, name, description, workout_date, notes)
-         VALUES (?1, ?2, ?3, ?4, ?5)
-         RETURNING *`
-      )
-      .bind(userId, name, description ?? null, workoutDate, notes ?? null)
-      .first<Workout>();
-    if (!row) throw new Error("Failed to create workout");
-    return row;
+    const row = await prisma.workout.create({
+      data: { user_id: userId, name, description, workout_date: workoutDate, notes },
+      select: WORKOUT_SELECT,
+    });
+    return mapWorkout(row);
   }
 
   async update(
@@ -64,38 +117,38 @@ export class WorkoutRepository {
     userId: number,
     fields: Partial<Pick<Workout, "name" | "description" | "workout_date" | "notes">>
   ): Promise<Workout | null> {
-    const sets: string[] = [];
-    const values: unknown[] = [];
-    let i = 1;
-
-    if (fields.name !== undefined) { sets.push(`name = ?${i++}`); values.push(fields.name); }
-    if (fields.description !== undefined) { sets.push(`description = ?${i++}`); values.push(fields.description); }
-    if (fields.workout_date !== undefined) { sets.push(`workout_date = ?${i++}`); values.push(fields.workout_date); }
-    if (fields.notes !== undefined) { sets.push(`notes = ?${i++}`); values.push(fields.notes); }
-
-    if (sets.length === 0) return this.findById(id, userId);
-
-    values.push(id, userId);
-    const row = await this.db
-      .prepare(
-        `UPDATE workouts SET ${sets.join(", ")}
-         WHERE id = ?${i++} AND user_id = ?${i++} AND deleted_at IS NULL
-         RETURNING *`
-      )
-      .bind(...values)
-      .first<Workout>();
-    return row ?? null;
+    if (Object.keys(fields).length === 0) return this.findById(id, userId);
+    try {
+      const row = await prisma.workout.updateMany({
+        where: { id, user_id: userId, deleted_at: null },
+        data: {
+          ...(fields.name !== undefined && { name: fields.name }),
+          ...(fields.description !== undefined && { description: fields.description }),
+          ...(fields.workout_date !== undefined && { workout_date: fields.workout_date }),
+          ...(fields.notes !== undefined && { notes: fields.notes }),
+        },
+      });
+      if (row.count === 0) return null;
+      return this.findById(id, userId);
+    } catch {
+      return null;
+    }
   }
 
   async softDelete(id: number, userId: number): Promise<boolean> {
-    const result = await this.db
-      .prepare(
-        `UPDATE workouts SET deleted_at = datetime('now')
-         WHERE id = ?1 AND user_id = ?2 AND deleted_at IS NULL`
-      )
-      .bind(id, userId)
-      .run();
-    return (result.meta.changes ?? 0) > 0;
+    const result = await prisma.workout.updateMany({
+      where: { id, user_id: userId, deleted_at: null },
+      data: { deleted_at: new Date() },
+    });
+    return result.count > 0;
+  }
+
+  async complete(id: number, userId: number, durationMinutes: number | null): Promise<boolean> {
+    const result = await prisma.workout.updateMany({
+      where: { id, user_id: userId, deleted_at: null },
+      data: { completed_at: new Date(), duration_minutes: durationMinutes },
+    });
+    return result.count > 0;
   }
 
   // ─── Workout Exercises ──────────────────────────────────────────────────────
@@ -108,17 +161,26 @@ export class WorkoutRepository {
     targetMuscle: string | null,
     equipment: string | null
   ): Promise<WorkoutExercise> {
-    const row = await this.db
-      .prepare(
-        `INSERT INTO workout_exercises
-           (workout_id, exercise_id, custom_exercise_id, order_index, target_muscle, equipment)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6)
-         RETURNING *`
-      )
-      .bind(workoutId, exerciseId, customExerciseId, orderIndex, targetMuscle, equipment)
-      .first<WorkoutExercise>();
-    if (!row) throw new Error("Failed to add exercise");
-    return row;
+    const row = await prisma.workoutExercise.create({
+      data: {
+        workout_id: workoutId,
+        exercise_id: exerciseId,
+        custom_exercise_id: customExerciseId,
+        order_index: orderIndex,
+        target_muscle: targetMuscle,
+        equipment,
+      },
+    });
+    return {
+      id: row.id,
+      workout_id: row.workout_id,
+      exercise_id: row.exercise_id,
+      custom_exercise_id: row.custom_exercise_id,
+      order_index: row.order_index,
+      target_muscle: row.target_muscle,
+      equipment: row.equipment,
+      created_at: d(row.created_at)!,
+    };
   }
 
   async copyWorkoutExercisesAndSets(
@@ -126,36 +188,32 @@ export class WorkoutRepository {
     targetWorkoutId: number,
     userId: number
   ): Promise<void> {
-    const sourceExercises = await this.db
-      .prepare(
-        `SELECT we.*
-         FROM workout_exercises we
-         JOIN workouts w ON w.id = we.workout_id
-         WHERE we.workout_id = ?1 AND w.user_id = ?2 AND w.deleted_at IS NULL
-         ORDER BY we.order_index ASC`
-      )
-      .bind(sourceWorkoutId, userId)
-      .all<WorkoutExercise>();
+    const sourceExercises = await prisma.workoutExercise.findMany({
+      where: {
+        workout_id: sourceWorkoutId,
+        workout: { user_id: userId, deleted_at: null },
+      },
+      include: { sets: { orderBy: { set_number: "asc" } } },
+      orderBy: { order_index: "asc" },
+    });
 
-    for (const sourceExercise of sourceExercises.results) {
-      const insertedExercise = await this.addExercise(
+    for (const we of sourceExercises) {
+      const inserted = await this.addExercise(
         targetWorkoutId,
-        sourceExercise.exercise_id,
-        sourceExercise.custom_exercise_id,
-        sourceExercise.order_index,
-        sourceExercise.target_muscle,
-        sourceExercise.equipment
+        we.exercise_id,
+        we.custom_exercise_id,
+        we.order_index,
+        we.target_muscle,
+        we.equipment
       );
-
-      const sourceSets = await this.getSets(sourceExercise.id);
-      for (const sourceSet of sourceSets) {
+      for (const s of we.sets) {
         await this.addSet(
-          insertedExercise.id,
-          sourceSet.set_number,
-          sourceSet.weight,
-          sourceSet.reps,
-          sourceSet.rest_seconds,
-          sourceSet.rir,
+          inserted.id,
+          s.set_number,
+          s.weight,
+          s.reps,
+          s.rest_seconds,
+          s.rir,
           false
         );
       }
@@ -163,103 +221,112 @@ export class WorkoutRepository {
   }
 
   async getExercises(workoutId: number, userId: number): Promise<WorkoutExercise[]> {
-    const rows = await this.db
-      .prepare(
-        `SELECT
-           we.*,
-           COALESCE(ec.name_ru, ec.name_en)  AS exercise_name,
-           ec.gif_url                         AS exercise_gif_url,
-           ec.image_url                       AS exercise_image_url,
-           ec.instructions_en                 AS exercise_instructions_en,
-           ec.instructions_ru                 AS exercise_instructions_ru,
-           ec.target                          AS exercise_target,
-           ec.equipment                       AS exercise_equipment,
-           NULL                               AS exercise_photo_key,
-           0                                  AS is_custom,
-           cx.name                            AS custom_name,
-           cx.photo_r2_key                    AS custom_photo_key,
-           cx.description                     AS custom_description,
-           cx.target                          AS custom_target,
-           cx.equipment                       AS custom_equipment,
-           (
-             SELECT s2.weight
-             FROM sets s2
-             JOIN workout_exercises we2 ON we2.id = s2.workout_exercise_id
-             JOIN workouts w2 ON w2.id = we2.workout_id
-             WHERE w2.user_id = ?2
-               AND w2.deleted_at IS NULL
-               AND w2.id != we.workout_id
-               AND s2.completed = 1
-               AND (
-                 (we.exercise_id IS NOT NULL AND we2.exercise_id = we.exercise_id)
-                 OR (we.custom_exercise_id IS NOT NULL AND we2.custom_exercise_id = we.custom_exercise_id)
-               )
-             ORDER BY w2.workout_date DESC, w2.created_at DESC, s2.id DESC
-             LIMIT 1
-           )                                  AS last_weight,
-           (
-             SELECT s2.reps
-             FROM sets s2
-             JOIN workout_exercises we2 ON we2.id = s2.workout_exercise_id
-             JOIN workouts w2 ON w2.id = we2.workout_id
-             WHERE w2.user_id = ?2
-               AND w2.deleted_at IS NULL
-               AND w2.id != we.workout_id
-               AND s2.completed = 1
-               AND (
-                 (we.exercise_id IS NOT NULL AND we2.exercise_id = we.exercise_id)
-                 OR (we.custom_exercise_id IS NOT NULL AND we2.custom_exercise_id = we.custom_exercise_id)
-               )
-             ORDER BY w2.workout_date DESC, w2.created_at DESC, s2.id DESC
-             LIMIT 1
-           )                                  AS last_reps
-         FROM workout_exercises we
-         LEFT JOIN exercise_catalog ec ON ec.id = we.exercise_id
-         LEFT JOIN custom_exercises cx ON cx.id = we.custom_exercise_id
-         WHERE we.workout_id = ?1
-         ORDER BY we.order_index ASC`
-      )
-      .bind(workoutId, userId)
-      .all<WorkoutExercise>();
-    return rows.results;
+    const rows = await prisma.$queryRaw<WorkoutExercise[]>`
+      SELECT
+        we.id, we.workout_id, we.exercise_id, we.custom_exercise_id,
+        we.order_index, we.target_muscle, we.equipment,
+        we.created_at,
+        COALESCE(ec.name_ru, ec.name_en)      AS exercise_name,
+        ec.gif_url                             AS exercise_gif_url,
+        ec.image_url                           AS exercise_image_url,
+        ec.instructions_en                     AS exercise_instructions_en,
+        ec.instructions_ru                     AS exercise_instructions_ru,
+        ec.target                              AS exercise_target,
+        ec.equipment                           AS exercise_equipment,
+        cx.name                                AS custom_name,
+        cx.photo_r2_key                        AS custom_photo_key,
+        cx.description                         AS custom_description,
+        cx.target                              AS custom_target,
+        cx.equipment                           AS custom_equipment,
+        (
+          SELECT s2.weight
+          FROM sets s2
+          JOIN workout_exercises we2 ON we2.id = s2.workout_exercise_id
+          JOIN workouts w2 ON w2.id = we2.workout_id
+          WHERE w2.user_id = ${userId}
+            AND w2.deleted_at IS NULL
+            AND w2.id != we.workout_id
+            AND s2.completed = TRUE
+            AND (
+              (we.exercise_id IS NOT NULL AND we2.exercise_id = we.exercise_id)
+              OR (we.custom_exercise_id IS NOT NULL AND we2.custom_exercise_id = we.custom_exercise_id)
+            )
+          ORDER BY w2.workout_date DESC, w2.created_at DESC, s2.id DESC
+          LIMIT 1
+        ) AS last_weight,
+        (
+          SELECT s2.reps
+          FROM sets s2
+          JOIN workout_exercises we2 ON we2.id = s2.workout_exercise_id
+          JOIN workouts w2 ON w2.id = we2.workout_id
+          WHERE w2.user_id = ${userId}
+            AND w2.deleted_at IS NULL
+            AND w2.id != we.workout_id
+            AND s2.completed = TRUE
+            AND (
+              (we.exercise_id IS NOT NULL AND we2.exercise_id = we.exercise_id)
+              OR (we.custom_exercise_id IS NOT NULL AND we2.custom_exercise_id = we.custom_exercise_id)
+            )
+          ORDER BY w2.workout_date DESC, w2.created_at DESC, s2.id DESC
+          LIMIT 1
+        ) AS last_reps
+      FROM workout_exercises we
+      LEFT JOIN exercise_catalog ec ON ec.id = we.exercise_id
+      LEFT JOIN custom_exercises cx ON cx.id = we.custom_exercise_id
+      WHERE we.workout_id = ${workoutId}
+      ORDER BY we.order_index ASC
+    `;
+    return rows.map((r) => ({
+      ...r,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      created_at: (r.created_at as any) instanceof Date ? ((r.created_at as unknown) as Date).toISOString() : (r.created_at as string),
+    }));
   }
 
-  async getWorkoutExercise(
-    id: number,
-    userId: number
-  ): Promise<WorkoutExercise | null> {
-    const row = await this.db
-      .prepare(
-        `SELECT we.* FROM workout_exercises we
-         JOIN workouts w ON w.id = we.workout_id
-         WHERE we.id = ?1 AND w.user_id = ?2 AND w.deleted_at IS NULL`
-      )
-      .bind(id, userId)
-      .first<WorkoutExercise>();
-    return row ?? null;
+  async getWorkoutExercise(id: number, userId: number): Promise<WorkoutExercise | null> {
+    const row = await prisma.workoutExercise.findFirst({
+      where: {
+        id,
+        workout: { user_id: userId, deleted_at: null },
+      },
+    });
+    if (!row) return null;
+    return {
+      id: row.id,
+      workout_id: row.workout_id,
+      exercise_id: row.exercise_id,
+      custom_exercise_id: row.custom_exercise_id,
+      order_index: row.order_index,
+      target_muscle: row.target_muscle,
+      equipment: row.equipment,
+      created_at: d(row.created_at)!,
+    };
   }
 
   async getSetContext(
     setId: number,
     userId: number
   ): Promise<{ set_id: number; workout_exercise_id: number; exercise_id: number | null; workout_date: string } | null> {
-    const row = await this.db
-      .prepare(
-        `SELECT
-           s.id                 AS set_id,
-           s.workout_exercise_id,
-           we.exercise_id,
-           w.workout_date
-         FROM sets s
-         JOIN workout_exercises we ON we.id = s.workout_exercise_id
-         JOIN workouts w ON w.id = we.workout_id
-         WHERE s.id = ?1
-           AND w.user_id = ?2
-           AND w.deleted_at IS NULL`
-      )
-      .bind(setId, userId)
-      .first<{ set_id: number; workout_exercise_id: number; exercise_id: number | null; workout_date: string }>();
-    return row ?? null;
+    const row = await prisma.set.findFirst({
+      where: {
+        id: setId,
+        workout_exercise: {
+          workout: { user_id: userId, deleted_at: null },
+        },
+      },
+      include: {
+        workout_exercise: {
+          include: { workout: true },
+        },
+      },
+    });
+    if (!row) return null;
+    return {
+      set_id: row.id,
+      workout_exercise_id: row.workout_exercise_id,
+      exercise_id: row.workout_exercise.exercise_id,
+      workout_date: row.workout_exercise.workout.workout_date,
+    };
   }
 
   // ─── Sets ───────────────────────────────────────────────────────────────────
@@ -274,27 +341,21 @@ export class WorkoutRepository {
     completed: boolean
   ): Promise<Set> {
     try {
-      const row = await this.db
-        .prepare(
-          `INSERT INTO sets
-             (workout_exercise_id, set_number, weight, reps, rest_seconds, rir, completed)
-           VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
-           RETURNING *`
-        )
-        .bind(
-          workoutExerciseId,
-          setNumber,
+      const row = await prisma.set.create({
+        data: {
+          workout_exercise_id: workoutExerciseId,
+          set_number: setNumber,
           weight,
           reps,
-          restSeconds,
+          rest_seconds: restSeconds,
           rir,
-          completed ? 1 : 0
-        )
-        .first<Set>();
-      if (!row) throw new Error("Failed to add set");
-      return row;
+          completed,
+        },
+      });
+      return mapSet(row);
     } catch (error) {
-      if (isUniqueConstraintError(error)) {
+      const msg = error instanceof Error ? error.message : String(error);
+      if (msg.includes("Unique constraint") || msg.includes("unique constraint")) {
         throw conflict(
           "Такой номер подхода уже существует для этого упражнения в тренировке",
           ErrorCodes.SetDuplicate
@@ -305,11 +366,11 @@ export class WorkoutRepository {
   }
 
   async getSets(workoutExerciseId: number): Promise<Set[]> {
-    const rows = await this.db
-      .prepare("SELECT * FROM sets WHERE workout_exercise_id = ?1 ORDER BY set_number ASC")
-      .bind(workoutExerciseId)
-      .all<Set>();
-    return rows.results;
+    const rows = await prisma.set.findMany({
+      where: { workout_exercise_id: workoutExerciseId },
+      orderBy: { set_number: "asc" },
+    });
+    return rows.map(mapSet);
   }
 
   async updateSet(
@@ -317,71 +378,60 @@ export class WorkoutRepository {
     userId: number,
     fields: Partial<Pick<Set, "weight" | "reps" | "rest_seconds" | "rir" | "completed">>
   ): Promise<Set | null> {
-    const sets: string[] = [];
-    const values: unknown[] = [];
-    let i = 1;
+    // Verify ownership first
+    const owned = await prisma.set.findFirst({
+      where: {
+        id,
+        workout_exercise: {
+          workout: { user_id: userId, deleted_at: null },
+        },
+      },
+    });
+    if (!owned) return null;
 
-    if (fields.weight !== undefined) { sets.push(`weight = ?${i++}`); values.push(fields.weight); }
-    if (fields.reps !== undefined) { sets.push(`reps = ?${i++}`); values.push(fields.reps); }
-    if (fields.rest_seconds !== undefined) { sets.push(`rest_seconds = ?${i++}`); values.push(fields.rest_seconds); }
-    if (fields.rir !== undefined) { sets.push(`rir = ?${i++}`); values.push(fields.rir); }
-    if (fields.completed !== undefined) { sets.push(`completed = ?${i++}`); values.push(fields.completed ? 1 : 0); }
+    if (Object.keys(fields).length === 0) return mapSet(owned);
 
-    if (sets.length === 0) {
-      return this.db
-        .prepare(
-          `SELECT s.* FROM sets s
-           JOIN workout_exercises we ON we.id = s.workout_exercise_id
-           JOIN workouts w ON w.id = we.workout_id
-           WHERE s.id = ?1 AND w.user_id = ?2`
-        )
-        .bind(id, userId)
-        .first<Set>() ?? null;
-    }
+    const data: {
+      weight?: number | null;
+      reps?: number | null;
+      rest_seconds?: number | null;
+      rir?: number | null;
+      completed?: boolean;
+    } = {};
+    if (fields.weight !== undefined) data.weight = fields.weight;
+    if (fields.reps !== undefined) data.reps = fields.reps;
+    if (fields.rest_seconds !== undefined) data.rest_seconds = fields.rest_seconds;
+    if (fields.rir !== undefined) data.rir = fields.rir;
+    if (fields.completed !== undefined) data.completed = fields.completed;
 
-    values.push(id, userId);
-    const row = await this.db
-      .prepare(
-        `UPDATE sets SET ${sets.join(", ")}
-         WHERE id = ?${i++}
-           AND workout_exercise_id IN (
-             SELECT we.id FROM workout_exercises we
-             JOIN workouts w ON w.id = we.workout_id
-             WHERE w.user_id = ?${i++} AND w.deleted_at IS NULL
-           )
-         RETURNING *`
-      )
-      .bind(...values)
-      .first<Set>();
-    return row ?? null;
+    const updated = await prisma.set.update({ where: { id }, data });
+    return mapSet(updated);
   }
 
   async deleteSet(id: number, userId: number): Promise<boolean> {
-    const result = await this.db
-      .prepare(
-        `DELETE FROM sets WHERE id = ?1
-           AND workout_exercise_id IN (
-             SELECT we.id FROM workout_exercises we
-             JOIN workouts w ON w.id = we.workout_id
-             WHERE w.user_id = ?2 AND w.deleted_at IS NULL
-           )`
-      )
-      .bind(id, userId)
-      .run();
-    return (result.meta.changes ?? 0) > 0;
+    const row = await prisma.set.findFirst({
+      where: {
+        id,
+        workout_exercise: {
+          workout: { user_id: userId, deleted_at: null },
+        },
+      },
+    });
+    if (!row) return false;
+    await prisma.set.delete({ where: { id } });
+    return true;
   }
 
   async deleteWorkoutExercise(id: number, userId: number): Promise<boolean> {
-    const result = await this.db
-      .prepare(
-        `DELETE FROM workout_exercises WHERE id = ?1
-           AND workout_id IN (
-             SELECT id FROM workouts WHERE user_id = ?2 AND deleted_at IS NULL
-           )`
-      )
-      .bind(id, userId)
-      .run();
-    return (result.meta.changes ?? 0) > 0;
+    const row = await prisma.workoutExercise.findFirst({
+      where: {
+        id,
+        workout: { user_id: userId, deleted_at: null },
+      },
+    });
+    if (!row) return false;
+    await prisma.workoutExercise.delete({ where: { id } });
+    return true;
   }
 
   async getExercisesWithSets(workoutId: number, userId: number): Promise<(WorkoutExercise & { sets: Set[] })[]> {
@@ -389,16 +439,15 @@ export class WorkoutRepository {
     if (exercises.length === 0) return [];
 
     const ids = exercises.map((e) => e.id);
-    const placeholders = ids.map((_, i) => `?${i + 1}`).join(", ");
-    const rows = await this.db
-      .prepare(`SELECT * FROM sets WHERE workout_exercise_id IN (${placeholders}) ORDER BY workout_exercise_id ASC, set_number ASC`)
-      .bind(...ids)
-      .all<Set>();
+    const sets = await prisma.set.findMany({
+      where: { workout_exercise_id: { in: ids } },
+      orderBy: [{ workout_exercise_id: "asc" }, { set_number: "asc" }],
+    });
 
     const setsMap = new Map<number, Set[]>();
-    for (const s of rows.results) {
+    for (const s of sets) {
       const arr = setsMap.get(s.workout_exercise_id) ?? [];
-      arr.push(s);
+      arr.push(mapSet(s));
       setsMap.set(s.workout_exercise_id, arr);
     }
 

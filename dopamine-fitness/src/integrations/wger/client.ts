@@ -65,11 +65,11 @@ export class WgerIntegration {
     let url: string | null = `${this.baseUrl}/exerciseinfo/?format=json&language=2&limit=100`;
 
     while (url) {
-      const response = await fetch(url);
+      const response: Response = await fetch(url);
       if (!response.ok) throw new Error(`wger API error: ${response.status}`);
-      const data = await response.json<WgerListResponse>();
+      const data: WgerListResponse = await response.json() as WgerListResponse;
       // Only include exercises that have at least one translation with a name
-      const valid = data.results.filter((ex) => ex.translations && ex.translations.length > 0);
+      const valid = data.results.filter((ex: WgerExercise) => ex.translations && ex.translations.length > 0);
       results.push(...valid);
       url = data.next;
     }
@@ -80,7 +80,7 @@ export class WgerIntegration {
   async fetchById(id: number): Promise<WgerExercise> {
     const response = await fetch(`${this.baseUrl}/exerciseinfo/${id}/?format=json`);
     if (!response.ok) throw new Error(`wger API error: ${response.status}`);
-    return response.json<WgerExercise>();
+    return response.json() as Promise<WgerExercise>;
   }
 
   async fetchExerciseImages(exerciseId: number, limit = 10): Promise<WgerImageItem[]> {
@@ -88,7 +88,7 @@ export class WgerIntegration {
       `${this.baseUrl}/exerciseimage/?format=json&limit=${limit}&exercise=${exerciseId}`
     );
     if (!response.ok) throw new Error(`wger API error: ${response.status}`);
-    const data = await response.json<WgerImageListResponse>();
+    const data = await response.json() as WgerImageListResponse;
     return data.results;
   }
 }

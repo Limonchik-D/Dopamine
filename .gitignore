@@ -5,3 +5,5 @@
 *.userosscache
 bin/
 obj/
+
+.dev.vars

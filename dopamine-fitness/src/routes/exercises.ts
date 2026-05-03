@@ -21,13 +21,13 @@ exerciseRoutes.get("/", async (c) => {
   // Auto-sync if catalog is empty
   const catalogEmpty = await service.isCatalogEmpty();
   if (catalogEmpty) {
-    c.executionCtx.waitUntil(service.syncFromExternalAPIs());
+    service.syncFromExternalAPIs().catch(() => {});
   }
 
   const result = await service.list(filters);
 
   // Keep list endpoint fast: translate only in the background for currently visible items.
-  c.executionCtx.waitUntil(service.backfillVisibleTranslations(result.exercises));
+  service.backfillVisibleTranslations(result.exercises).catch(() => {});
 
   return c.json({ success: true, data: result });
 });

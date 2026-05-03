@@ -5,6 +5,7 @@ import { validate } from "../validators/validate.js";
 import { checkinSchema } from "../validators/schemas.js";
 import { getAppConfig } from "../config/env.js";
 import { checkinsCacheKey } from "../utils/cacheKeys.js";
+import { prisma } from "../db/prisma.js";
 
 export const checkinRoutes = new Hono<{ Bindings: Env; Variables: HonoVariables }>();
 
@@ -26,19 +27,14 @@ checkinRoutes.get("/", async (c) => {
     return c.json({ success: true, data: cached });
   }
 
-  const rows = await c.env.DB
-    .prepare(
-      `SELECT id, user_id, checkin_date, created_at
-       FROM daily_checkins
-       WHERE user_id = ?1
-       ORDER BY checkin_date ASC`
-    )
-    .bind(userId)
-    .all();
+  const rows = await prisma.dailyCheckin.findMany({
+    where: { user_id: userId },
+    orderBy: { checkin_date: "asc" },
+  });
 
   const data = {
-    checkins: rows.results,
-    total: rows.results.length,
+    checkins: rows,
+    total: rows.length,
   };
 
   await c.env.KV.put(cacheKey, JSON.stringify(data), {
@@ -62,24 +58,17 @@ checkinRoutes.post("/", async (c) => {
   const fallbackDate = formatDateKeyUtc(today);
   const checkinDate = payload.date ?? fallbackDate;
 
-  await c.env.DB
-    .prepare(
-      `INSERT OR IGNORE INTO daily_checkins (user_id, checkin_date)
-       VALUES (?1, ?2)`
-    )
-    .bind(userId, checkinDate)
-    .run();
+  await prisma.dailyCheckin.upsert({
+    where: { user_id_checkin_date: { user_id: userId, checkin_date: checkinDate } },
+    create: { user_id: userId, checkin_date: checkinDate },
+    update: {},
+  });
 
   await c.env.KV.delete(checkinsCacheKey(userId));
 
-  const checkin = await c.env.DB
-    .prepare(
-      `SELECT id, user_id, checkin_date, created_at
-       FROM daily_checkins
-       WHERE user_id = ?1 AND checkin_date = ?2`
-    )
-    .bind(userId, checkinDate)
-    .first();
+  const checkin = await prisma.dailyCheckin.findUnique({
+    where: { user_id_checkin_date: { user_id: userId, checkin_date: checkinDate } },
+  });
 
   return c.json({
     success: true,

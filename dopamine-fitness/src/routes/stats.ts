@@ -25,7 +25,7 @@ async function handleStatsPeriod(c: AppContext, period: StatsPeriod) {
     return c.json({ success: true, data: cached });
   }
 
-  const service = new StatsService(c.env.DB);
+  const service = new StatsService();
   const data = await service.getStats(userId, period);
 
   await c.env.KV.put(cacheKey, JSON.stringify(data), {
@@ -67,7 +67,7 @@ statsRoutes.get("/exercise/:id", async (c) => {
     return c.json({ success: true, data: cached });
   }
 
-  const service = new StatsService(c.env.DB);
+  const service = new StatsService();
   const data = await service.getExerciseProgress(userId, exerciseId, period);
 
   await c.env.KV.put(cacheKey, JSON.stringify(data), {
@@ -85,7 +85,7 @@ statsRoutes.get("/summary", async (c) => {
   const cached = await c.env.KV.get(cacheKey, "json");
   if (cached) return c.json({ success: true, data: cached });
 
-  const service = new StatsService(c.env.DB);
+  const service = new StatsService();
   const data = await service.getSummary(userId);
 
   await c.env.KV.put(cacheKey, JSON.stringify(data), { expirationTtl: 300 });

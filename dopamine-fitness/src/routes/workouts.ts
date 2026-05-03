@@ -1,4 +1,4 @@
-﻿import { Hono } from "hono";
+import { Hono } from "hono";
 import type { Env, HonoVariables } from "../types/index.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { WorkoutService } from "../services/workoutService.js";
@@ -19,7 +19,7 @@ workoutRoutes.use("*", authenticate());
 workoutRoutes.get("/", async (c) => {
   const userId = c.get("userId");
   const { page, limit } = parsePagination(new URL(c.req.url));
-  const service = new WorkoutService(c.env.DB);
+  const service = new WorkoutService();
   const result = await service.list(userId, page, limit);
   return c.json({ success: true, data: result });
 });
@@ -27,7 +27,7 @@ workoutRoutes.get("/", async (c) => {
 workoutRoutes.post("/", async (c) => {
   const userId = c.get("userId") as number;
   const input = validate(workoutSchema, await c.req.json());
-  const service = new WorkoutService(c.env.DB);
+  const service = new WorkoutService();
   const workout = await service.create(userId, input);
   await invalidateStatsCache(c.env, userId);
   return c.json({ success: true, data: workout }, 201);
@@ -36,7 +36,7 @@ workoutRoutes.post("/", async (c) => {
 workoutRoutes.get("/:id", async (c) => {
   const userId = c.get("userId");
   const id = parseInt(c.req.param("id"), 10);
-  const service = new WorkoutService(c.env.DB);
+  const service = new WorkoutService();
   const workout = await service.get(id, userId);
   const exercises = await service.getExercises(id, userId);
   return c.json({ success: true, data: { ...workout, exercises } });
@@ -52,7 +52,7 @@ workoutRoutes.post("/:id/duplicate", async (c) => {
   };
 
   const date = body.workout_date ?? new Date().toISOString().slice(0, 10);
-  const service = new WorkoutService(c.env.DB);
+  const service = new WorkoutService();
   const duplicated = await service.duplicateWorkout(id, userId, date, body.name);
   await invalidateStatsCache(c.env, userId);
   return c.json({ success: true, data: duplicated }, 201);
@@ -62,7 +62,7 @@ workoutRoutes.patch("/:id", async (c) => {
   const userId = c.get("userId") as number;
   const id = parseInt(c.req.param("id"), 10);
   const input = validate(workoutPatchSchema, await c.req.json());
-  const service = new WorkoutService(c.env.DB);
+  const service = new WorkoutService();
   const workout = await service.update(id, userId, input);
   await invalidateStatsCache(c.env, userId);
   return c.json({ success: true, data: workout });
@@ -71,7 +71,7 @@ workoutRoutes.patch("/:id", async (c) => {
 workoutRoutes.delete("/:id", async (c) => {
   const userId = c.get("userId") as number;
   const id = parseInt(c.req.param("id"), 10);
-  const service = new WorkoutService(c.env.DB);
+  const service = new WorkoutService();
   await service.delete(id, userId);
   await invalidateStatsCache(c.env, userId);
   return c.json({ success: true, message: "���������� �������" });
@@ -81,7 +81,7 @@ workoutRoutes.post("/:id/exercises", async (c) => {
   const userId = c.get("userId") as number;
   const workoutId = parseInt(c.req.param("id"), 10);
   const input = validate(workoutExerciseSchema, await c.req.json());
-  const service = new WorkoutService(c.env.DB);
+  const service = new WorkoutService();
   const we = await service.addExercise(workoutId, userId, input);
   await invalidateStatsCache(c.env, userId);
   return c.json({ success: true, data: we }, 201);
@@ -91,7 +91,7 @@ workoutRoutes.post("/exercises/:weId/sets", async (c) => {
   const userId = c.get("userId") as number;
   const weId = parseInt(c.req.param("weId"), 10);
   const input = validate(setSchema, await c.req.json());
-  const service = new WorkoutService(c.env.DB);
+  const service = new WorkoutService();
   const set = await service.addSet(weId, userId, input);
   await invalidateStatsCache(c.env, userId);
   return c.json({ success: true, data: set }, 201);
@@ -101,7 +101,7 @@ workoutRoutes.patch("/exercises/:weId/sets/:setId", async (c) => {
   const userId = c.get("userId") as number;
   const setId = parseInt(c.req.param("setId"), 10);
   const input = validate(setSchema.partial(), await c.req.json());
-  const service = new WorkoutService(c.env.DB);
+  const service = new WorkoutService();
   const set = await service.updateSet(setId, userId, input);
   await invalidateStatsCache(c.env, userId);
   return c.json({ success: true, data: set });
@@ -110,7 +110,7 @@ workoutRoutes.patch("/exercises/:weId/sets/:setId", async (c) => {
 workoutRoutes.delete("/exercises/:weId/sets/:setId", async (c) => {
   const userId = c.get("userId") as number;
   const setId = parseInt(c.req.param("setId"), 10);
-  const service = new WorkoutService(c.env.DB);
+  const service = new WorkoutService();
   await service.deleteSet(setId, userId);
   await invalidateStatsCache(c.env, userId);
   return c.json({ success: true, message: "������ �����" });
@@ -119,7 +119,7 @@ workoutRoutes.delete("/exercises/:weId/sets/:setId", async (c) => {
 workoutRoutes.delete("/exercises/:weId", async (c) => {
   const userId = c.get("userId") as number;
   const weId = parseInt(c.req.param("weId"), 10);
-  const service = new WorkoutService(c.env.DB);
+  const service = new WorkoutService();
   await service.removeExercise(weId, userId);
   await invalidateStatsCache(c.env, userId);
   return c.json({ success: true, message: "���������� �������" });
@@ -130,10 +130,8 @@ workoutRoutes.post("/:id/complete", async (c) => {
   const userId = c.get("userId") as number;
   const id = parseInt(c.req.param("id"), 10);
   const body = await c.req.json().catch(() => ({})) as { duration_minutes?: number };
-  await c.env.DB
-    .prepare("UPDATE workouts SET completed_at = datetime('now'), duration_minutes = ?1 WHERE id = ?2 AND user_id = ?3 AND deleted_at IS NULL")
-    .bind(body.duration_minutes ?? null, id, userId)
-    .run();
+  const service = new WorkoutService();
+  await service.complete(id, userId, body.duration_minutes ?? null);
   await invalidateStatsCache(c.env, userId);
   return c.json({ success: true });
 });

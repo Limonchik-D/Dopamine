@@ -3,37 +3,32 @@ import type { Env, HonoVariables } from "../types/index.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { requireRole } from "../middlewares/requireRole.js";
 import { getDependenciesHealth } from "../utils/health.js";
+import { prisma } from "../db/prisma.js";
 
 export const adminRoutes = new Hono<{ Bindings: Env; Variables: HonoVariables }>();
 
 adminRoutes.use("*", authenticate(), requireRole("admin"));
 
 adminRoutes.get("/overview", async (c) => {
-  const users = await c.env.DB.prepare("SELECT COUNT(*) AS count FROM users").first<{ count: number }>();
-  const workouts = await c.env.DB.prepare("SELECT COUNT(*) AS count FROM workouts WHERE deleted_at IS NULL").first<{ count: number }>();
-  const customExercises = await c.env.DB.prepare("SELECT COUNT(*) AS count FROM custom_exercises WHERE deleted_at IS NULL").first<{ count: number }>();
+  const [users, workouts, customExercises] = await Promise.all([
+    prisma.user.count(),
+    prisma.workout.count({ where: { deleted_at: null } }),
+    prisma.customExercise.count({ where: { deleted_at: null } }),
+  ]);
 
   return c.json({
     success: true,
-    data: {
-      users: users?.count ?? 0,
-      workouts: workouts?.count ?? 0,
-      customExercises: customExercises?.count ?? 0,
-    },
+    data: { users, workouts, customExercises },
   });
 });
 
 adminRoutes.get("/diagnostics", async (c) => {
   const [health, users, workouts, checkins] = await Promise.all([
     getDependenciesHealth(c.env),
-    c.env.DB.prepare("SELECT COUNT(*) AS count FROM users").first<{ count: number }>(),
-    c.env.DB.prepare("SELECT COUNT(*) AS count FROM workouts WHERE deleted_at IS NULL").first<{ count: number }>(),
-    c.env.DB.prepare("SELECT COUNT(*) AS count FROM daily_checkins").first<{ count: number }>(),
+    prisma.user.count(),
+    prisma.workout.count({ where: { deleted_at: null } }),
+    prisma.dailyCheckin.count(),
   ]);
-
-  const latestMigration = await c.env.DB
-    .prepare("SELECT name, applied_at FROM d1_migrations ORDER BY applied_at DESC LIMIT 1")
-    .first<{ name: string; applied_at: string }>();
 
   return c.json({
     success: true,
@@ -43,32 +38,24 @@ adminRoutes.get("/diagnostics", async (c) => {
         db: health.db,
         kv: health.kv,
       },
-      counters: {
-        users: users?.count ?? 0,
-        workouts: workouts?.count ?? 0,
-        checkins: checkins?.count ?? 0,
-      },
-      latestMigration: latestMigration ?? null,
+      counters: { users, workouts, checkins },
       ts: new Date().toISOString(),
     },
   });
 });
 
 adminRoutes.get("/users", async (c) => {
-  const rows = await c.env.DB
-    .prepare(
-      `SELECT id, email, username, role, created_at
-       FROM users
-       ORDER BY created_at DESC
-       LIMIT 200`
-    )
-    .all();
+  const users = await prisma.user.findMany({
+    select: { id: true, email: true, username: true, role: true, created_at: true },
+    orderBy: { created_at: "desc" },
+    take: 200,
+  });
 
   return c.json({
     success: true,
     data: {
-      users: rows.results,
-      total: rows.results.length,
+      users,
+      total: users.length,
     },
   });
 });

@@ -22,7 +22,7 @@ const addFavoriteSchema = z.object({
 // GET /favorites
 favoritesRoutes.get("/", async (c) => {
   const userId = c.get("userId");
-  const repo = new FavoritesRepository(c.env.DB);
+  const repo = new FavoritesRepository();
   const favorites = await repo.list(userId);
   return c.json({ success: true, data: favorites });
 });
@@ -31,7 +31,7 @@ favoritesRoutes.get("/", async (c) => {
 favoritesRoutes.post("/", async (c) => {
   const userId = c.get("userId");
   const input = validate(addFavoriteSchema, await c.req.json());
-  const repo = new FavoritesRepository(c.env.DB);
+  const repo = new FavoritesRepository();
   const favorite = await repo.add(
     userId,
     input.exercise_id ?? null,
@@ -44,7 +44,7 @@ favoritesRoutes.post("/", async (c) => {
 favoritesRoutes.delete("/", async (c) => {
   const userId = c.get("userId");
   const input = validate(addFavoriteSchema, await c.req.json());
-  const repo = new FavoritesRepository(c.env.DB);
+  const repo = new FavoritesRepository();
   const removed = await repo.remove(
     userId,
     input.exercise_id ?? null,

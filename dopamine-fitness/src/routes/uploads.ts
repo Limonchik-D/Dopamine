@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import type { Env, HonoVariables } from "../types/index.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { getAppConfig } from "../config/env.js";
+import { prisma } from "../db/prisma.js";
 
 const ALLOWED_MIME_TYPES = new Set([
   "image/jpeg",
@@ -57,25 +58,15 @@ uploadRoutes.post("/photo", async (c) => {
   const customExerciseId = formData.get("custom_exercise_id");
   if (customExerciseId) {
     const ceId = parseInt(String(customExerciseId), 10);
-    // Verify ownership
-    const ce = await c.env.DB
-      .prepare(
-        "SELECT id FROM custom_exercises WHERE id = ?1 AND user_id = ?2 AND deleted_at IS NULL"
-      )
-      .bind(ceId, userId)
-      .first();
-
+    // Verify ownership and update
+    const ce = await prisma.customExercise.findFirst({
+      where: { id: ceId, user_id: userId, deleted_at: null },
+    });
     if (ce) {
-      await c.env.DB.batch([
-        c.env.DB
-          .prepare("UPDATE custom_exercises SET photo_r2_key = ?1 WHERE id = ?2")
-          .bind(r2Key, ceId),
-        c.env.DB
-          .prepare(
-            "INSERT INTO exercise_media (custom_exercise_id, r2_key, media_type) VALUES (?1, ?2, 'image')"
-          )
-          .bind(ceId, r2Key),
-      ]);
+      await prisma.customExercise.update({ where: { id: ceId }, data: { photo_r2_key: r2Key } });
+      await prisma.exerciseMedia.create({
+        data: { custom_exercise_id: ceId, r2_key: r2Key, media_type: "image" },
+      });
     }
   }
 

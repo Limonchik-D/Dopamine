@@ -46,7 +46,7 @@ export class ExerciseService {
   private repo: ExerciseRepository;
 
   constructor(private env: Env) {
-    this.repo = new ExerciseRepository(env.DB);
+    this.repo = new ExerciseRepository();
   }
 
   async list(filters: ExerciseFilterInput): Promise<{
@@ -71,11 +71,11 @@ export class ExerciseService {
     bodyParts: string[];
   }> {
     const cacheKey = "exercise_filters";
-    const cached = await this.env.KV.get<{
+    const cached = await this.env.KV.get(cacheKey, "json") as {
       targets: string[];
       equipment: string[];
       bodyParts: string[];
-    }>(cacheKey, "json");
+    } | null;
 
     if (cached) return cached;
 

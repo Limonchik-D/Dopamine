@@ -19,6 +19,7 @@ import { NinjasClient } from "../integrations/ninjas/client.js";
 import { WgerIntegration } from "../integrations/wger/client.js";
 import { TranslationService } from "./translationService.js";
 import { bestMatch, normalizeName } from "../utils/nameMatch.js";
+import { prisma } from "../db/prisma.js";
 
 const KV_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
 const kvKey = (id: number) => `enrich:v3:${id}`;
@@ -59,21 +60,13 @@ export class ExerciseEnrichmentService {
     const cached = await this.env.KV.get(kvKey(exerciseId), "json") as EnrichedExercise | null;
     if (cached) return cached;
 
-    // 2. Load base row from D1
-    const base = await this.env.DB
-      .prepare("SELECT * FROM exercise_catalog WHERE id = ?1")
-      .bind(exerciseId)
-      .first<{
-        id: number; source_exercise_id: string; name_en: string; name_ru: string | null; target: string | null;
-        equipment: string | null; body_part: string | null; gif_url: string | null;
-        image_url: string | null; instructions_en: string | null; instructions_ru: string | null;
-        difficulty: string | null; secondary_muscles: string | null; source: string;
-      }>();
-
+    // 2. Load base row from Prisma
+    const base = await prisma.exerciseCatalog.findUnique({ where: { id: exerciseId } });
     if (!base) throw new Error("Exercise not found");
 
     // 3. If already fully enriched for preview use-case, cache and return.
-    if (base.gif_url && base.image_url && base.difficulty && base.instructions_en && base.instructions_ru) {
+    const baseAsRecord = base as unknown as Record<string, unknown>;
+    if (base.gif_url && base.image_url && baseAsRecord["difficulty"] && base.instructions_en && base.instructions_ru) {
       const result = this.toEnriched(base, []);
       await this.cacheKV(result);
       return result;
@@ -89,9 +82,9 @@ export class ExerciseEnrichmentService {
     let image_url = base.image_url;
     let instructions_en = base.instructions_en;
     let instructions_ru = base.instructions_ru;
-    let difficulty: string | null = base.difficulty ?? null;
-    let secondary_muscles: string[] | null = base.secondary_muscles
-      ? (JSON.parse(base.secondary_muscles) as string[])
+    let difficulty: string | null = (base as unknown as Record<string, unknown>)["difficulty"] as string | null ?? null;
+    let secondary_muscles: string[] | null = (base as unknown as Record<string, unknown>)["secondary_muscles"]
+      ? (JSON.parse((base as unknown as Record<string, unknown>)["secondary_muscles"] as string) as string[])
       : null;
 
     // ── wger: description + static image (free source) ───────────────────
@@ -229,30 +222,15 @@ export class ExerciseEnrichmentService {
       }
     }
 
-    // ── Persist enrichment back to D1 ─────────────────────────────────────
-    await this.env.DB
-      .prepare(
-        `UPDATE exercise_catalog SET
-           gif_url = COALESCE(?1, gif_url),
-           image_url = COALESCE(?2, image_url),
-           instructions_en = COALESCE(?3, instructions_en),
-           instructions_ru = COALESCE(?4, instructions_ru),
-           difficulty = COALESCE(?5, difficulty),
-           secondary_muscles = COALESCE(?6, secondary_muscles),
-           name_normalized = ?7
-         WHERE id = ?8`
-      )
-      .bind(
-        gif_url,
-        image_url,
-        instructions_en,
-        instructions_ru,
-        difficulty,
-        secondary_muscles ? JSON.stringify(secondary_muscles) : null,
-        normalizeName(base.name_en),
-        exerciseId
-      )
-      .run();
+    // ── Persist enrichment back to DB ─────────────────────────────────────
+    await prisma.$executeRaw`
+      UPDATE exercise_catalog SET
+        gif_url = COALESCE(${gif_url}, gif_url),
+        image_url = COALESCE(${image_url}, image_url),
+        instructions_en = COALESCE(${instructions_en}, instructions_en),
+        instructions_ru = COALESCE(${instructions_ru}, instructions_ru)
+      WHERE id = ${exerciseId}
+    `;
 
     const result: EnrichedExercise = {
       id: base.id,
@@ -282,13 +260,27 @@ export class ExerciseEnrichmentService {
       id: number; name_en: string; name_ru: string | null; target: string | null;
       equipment: string | null; body_part: string | null; gif_url: string | null;
       image_url: string | null; instructions_en: string | null; instructions_ru: string | null;
-      difficulty: string | null; secondary_muscles: string | null; source: string;
+      source: string;
     },
     enrichedFrom: string[]
   ): EnrichedExercise {
+    const r = row as unknown as Record<string, unknown>;
     return {
-      ...row,
-      secondary_muscles: row.secondary_muscles ? JSON.parse(row.secondary_muscles) as string[] : null,
+      id: row.id,
+      name_en: row.name_en,
+      name_ru: row.name_ru,
+      target: row.target,
+      equipment: row.equipment,
+      body_part: row.body_part,
+      gif_url: row.gif_url,
+      image_url: row.image_url,
+      instructions_en: row.instructions_en,
+      instructions_ru: row.instructions_ru,
+      difficulty: (r["difficulty"] as string | null) ?? null,
+      secondary_muscles: r["secondary_muscles"]
+        ? (JSON.parse(r["secondary_muscles"] as string) as string[])
+        : null,
+      source: row.source,
       enriched_from: enrichedFrom,
     };
   }
@@ -307,16 +299,13 @@ export class ExerciseEnrichmentService {
     confidence: number
   ): Promise<void> {
     try {
-      await this.env.DB
-        .prepare(
-          `INSERT OR REPLACE INTO exercise_name_map
-             (exercise_id, external_source, external_id, external_name, confidence)
-           VALUES (?1, ?2, ?3, ?4, ?5)`
-        )
-        .bind(exerciseId, source, externalId, externalName, confidence)
-        .run();
+      await prisma.exerciseNameMap.upsert({
+        where: { exercise_id_external_source: { exercise_id: exerciseId, external_source: source as "exercisedb" | "wger" | "ninjas" } },
+        create: { exercise_id: exerciseId, external_source: source as "exercisedb" | "wger" | "ninjas", external_id: externalId, external_name: externalName, confidence },
+        update: { external_id: externalId, external_name: externalName, confidence },
+      });
     } catch {
-      // Non-critical — don't fail enrichment
+      // Non-critical
     }
   }
 

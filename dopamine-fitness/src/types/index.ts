@@ -1,17 +1,42 @@
-// ─── Cloudflare Bindings ─────────────────────────────────────────────────────
+// ─── KV / R2 minimal interfaces (compatible with CF bindings + local shims) ───
+
+export interface AppKV {
+  get(key: string, type?: "text"): Promise<string | null>;
+  get(key: string, type: "json"): Promise<unknown>;
+  put(key: string, value: string, opts?: { expirationTtl?: number }): Promise<void>;
+  delete(key: string): Promise<void>;
+  list(opts?: {
+    prefix?: string;
+    cursor?: string;
+  }): Promise<{ keys: { name: string }[]; list_complete: boolean; cursor?: string }>;
+}
+
+export interface AppR2 {
+  put(
+    key: string,
+    value: ArrayBuffer,
+    opts?: {
+      httpMetadata?: { contentType?: string };
+      customMetadata?: Record<string, string>;
+    }
+  ): Promise<void>;
+  get(key: string): Promise<{
+    body: ReadableStream;
+    writeHttpMetadata(headers: Headers): void;
+  } | null>;
+}
+
+// ─── Application Environment (KV/R2 use compatible interfaces) ───────────────
 
 export interface Env {
-  // Static assets binding
-  ASSETS?: Fetcher;
+  // Static assets
+  ASSETS?: { fetch(request: Request): Promise<Response> };
 
-  // D1 — structured relational data
-  DB: D1Database;
+  // KV — cache, sessions (local: LocalKV, prod: CF KVNamespace)
+  KV: AppKV;
 
-  // KV — cache, sessions, settings, feature flags
-  KV: KVNamespace;
-
-  // R2 — media storage (photos, GIFs)
-  R2_BUCKET: R2Bucket;
+  // R2 — media storage (local: LocalR2, prod: CF R2Bucket)
+  R2_BUCKET: AppR2;
 
   // Environment variables
   ENVIRONMENT: "development" | "staging" | "production";
@@ -22,7 +47,7 @@ export interface Env {
   EXERCISEDB_BASE_URL: string;
   EXERCISEDB_API_KEY: string;
   WGER_BASE_URL: string;
-  NINJAS_API_KEY?: string;   // API-Ninjas exercises — optional enrichment source
+  NINJAS_API_KEY?: string;
   APP_NAME: string;
   APP_ALLOWED_ORIGINS: string;
   ADMIN_EMAILS?: string;
@@ -42,8 +67,6 @@ export interface HonoVariables {
   requestId: string;
 }
 
-// ─── Application Context ─────────────────────────────────────────────────────
-
 export interface AppContext {
   env: Env;
   userId?: number;
@@ -53,7 +76,7 @@ export interface AppContext {
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
 export interface JwtPayload {
-  sub: number;       // user id
+  sub: number;
   email: string;
   role?: UserRole;
   iat: number;
@@ -114,6 +137,8 @@ export interface UserProfile {
   locale: "ru" | "en";
   theme: "calm" | "sport" | "minimal" | "dark";
   units: "metric" | "imperial";
+  height_cm?: number | null;
+  weight_kg?: number | null;
 }
 
 export interface UserSettings {
@@ -135,6 +160,8 @@ export interface Workout {
   notes: string | null;
   created_at: string;
   deleted_at: string | null;
+  completed_at: string | null;
+  duration_minutes: number | null;
 }
 
 export interface WorkoutExercise {
@@ -146,7 +173,6 @@ export interface WorkoutExercise {
   target_muscle: string | null;
   equipment: string | null;
   created_at: string;
-  // Joined enrichment fields (present when loaded via getExercises JOIN)
   exercise_name?: string | null;
   exercise_gif_url?: string | null;
   exercise_image_url?: string | null;
@@ -159,7 +185,6 @@ export interface WorkoutExercise {
   custom_description?: string | null;
   custom_target?: string | null;
   custom_equipment?: string | null;
-  // Suggested values from last completed workout for the same exercise
   last_weight?: number | null;
   last_reps?: number | null;
 }
@@ -192,6 +217,8 @@ export interface ExerciseCatalog {
   image_url: string | null;
   instructions_en: string | null;
   instructions_ru: string | null;
+  difficulty?: string | null;
+  secondary_muscles?: string | null;
 }
 
 export interface CustomExercise {
@@ -254,19 +281,21 @@ export interface WgerExercise {
   id: number;
   uuid: string;
   category: { id: number; name: string };
-  muscles: { id: number; name_en: string; name: string; image_url_main?: string | null; image_url_secondary?: string | null }[];
-  muscles_secondary: { id: number; name_en: string; name: string; image_url_main?: string | null; image_url_secondary?: string | null }[];
-  equipment: { id: number; name: string }[];
-  translations: {
+  muscles: {
     id: number;
-    language: number;
+    name_en: string;
     name: string;
-    description: string;
+    image_url_main?: string | null;
+    image_url_secondary?: string | null;
   }[];
-  images?: {
+  muscles_secondary: {
     id: number;
-    image: string;
-    is_main: boolean;
-    status?: string;
+    name_en: string;
+    name: string;
+    image_url_main?: string | null;
+    image_url_secondary?: string | null;
   }[];
+  equipment: { id: number; name: string }[];
+  translations: { id: number; language: number; name: string; description: string }[];
+  images?: { id: number; image: string; is_main: boolean; status?: string }[];
 }
