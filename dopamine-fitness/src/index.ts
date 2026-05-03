@@ -18,11 +18,22 @@ import { errorHandler } from "./middlewares/errorHandler.js";
 import { requestId } from "./middlewares/requestId.js";
 import { rateLimiter } from "./middlewares/rateLimiter.js";
 import { getAppConfig } from "./config/env.js";
+import { initPrisma } from "./db/prisma.js";
 
 const app = new Hono<{ Bindings: Env; Variables: HonoVariables }>();
 
 // ─── Global Middleware ────────────────────────────────────────────────────────
 
+// Initialize Prisma with DATABASE_URL from CF Workers env bindings on first request.
+app.use("*", async (c, next) => {
+  try {
+    const url = c.env.DATABASE_URL;
+    if (url) initPrisma(url);
+  } catch (e) {
+    console.error("initPrisma failed:", e);
+  }
+  await next();
+});
 app.use("*", requestId());
 app.use("*", logger());
 app.use("*", secureHeaders());

@@ -1,5 +1,5 @@
 import type { Env } from "../types/index.js";
-import { prisma } from "../db/prisma.js";
+import { prisma, initPrisma } from "../db/prisma.js";
 
 export type DependenciesHealth = {
   db: boolean;
@@ -10,6 +10,15 @@ export type DependenciesHealth = {
 export async function getDependenciesHealth(env: Env): Promise<DependenciesHealth> {
   let db = false;
   let kv = false;
+
+  // Ensure Prisma is initialized with env binding (not process.env)
+  if (env.DATABASE_URL) {
+    try {
+      initPrisma(env.DATABASE_URL);
+    } catch {
+      return { db: false, kv: false, ready: false };
+    }
+  }
 
   try {
     await prisma.$queryRaw`SELECT 1`;
