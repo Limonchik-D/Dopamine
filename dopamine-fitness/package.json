@@ -11,6 +11,7 @@
     "web:type-check": "npm --prefix ./web run type-check",
     "web:build": "npm --prefix ./web run build",
     "build:all": "npm run type-check && npm run web:type-check && npm run web:build",
+    "deploy": "wrangler deploy",
     "smoke": "node ./scripts/smoke.mjs",
     "deploy:prod": "npm run build:all && wrangler deploy",
     "deploy:staging": "npm run build:all && wrangler deploy --env staging",

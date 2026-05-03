@@ -1,16 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 
-declare global {
-  // eslint-disable-next-line no-var
-  var __prisma: PrismaClient | undefined;
-}
-
-export const prisma: PrismaClient =
-  global.__prisma ??
-  new PrismaClient({
-    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-  });
-
-if (process.env.NODE_ENV !== "production") {
-  global.__prisma = prisma;
-}
+// Single shared instance. Works in both Node.js (local dev) and
+// Cloudflare Workers (nodejs_compat). The global pattern is intentionally
+// omitted: CF Workers isolates don't share global state across requests.
+export const prisma = new PrismaClient({
+  log: ["error"],
+});
