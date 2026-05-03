@@ -7,3 +7,4 @@ bin/
 obj/
 
 .dev.vars
+.wrangler/
